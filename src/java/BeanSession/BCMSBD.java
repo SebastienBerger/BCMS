@@ -42,12 +42,13 @@ public class BCMSBD implements BCMSBDLocal {
     }
     
     @Override
-    public void createEvent(String request, String exec) {
+    public void createEvent(String request, String exec, String caller) {
         Event event = new Event();
         event.setSessionId(_session);
         String name = request + date();
         event.setEventName(name);
         event.setExecutionTrace(exec);
+        event.setCaller(caller);
         _entity_manager.persist(event);
     }
 

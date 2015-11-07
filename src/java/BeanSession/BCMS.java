@@ -442,7 +442,7 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
     @Override
     public void FSC_connection_request() throws Statechart_exception {
         _bCMS_state_machine.run_to_completion(_FSC_connection_request);
-        service.createEvent(_FSC_connection_request,_bCMS_state_machine.current_state());
+        service.createEvent(_FSC_connection_request,_bCMS_state_machine.current_state(),"FSC");
         
         List<FireTruck> listeFireTruck = service.getFireTruck();
         for(int i=0; i<listeFireTruck.size(); i++){
@@ -451,7 +451,7 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
             
             service.createSessionFireTruck(listeFireTruck.get(i),i);
             
-            service.createEvent(_Fire_truck_dispatched, _bCMS_state_machine.current_state());
+            service.createEvent(_Fire_truck_dispatched, _bCMS_state_machine.current_state(),"FSC");
      
         }
         service.FSC_connected();
@@ -460,7 +460,7 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
     @Override
     public void PSC_connection_request() throws Statechart_exception {
         _bCMS_state_machine.run_to_completion(_PSC_connection_request);
-        service.createEvent(_PSC_connection_request, _bCMS_state_machine.current_state());
+        service.createEvent(_PSC_connection_request, _bCMS_state_machine.current_state(),"PSC");
         service.PSC_connected();
 
     }
@@ -490,7 +490,7 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
         System.out.println(_last_fire_truck_route);
         if (_last_fire_truck_route != null) {
             _bCMS_state_machine.run_to_completion(_Route_for_fire_trucks);
-            service.createEvent(_Route_for_fire_trucks, _bCMS_state_machine.current_state());
+            service.createEvent(_Route_for_fire_trucks, _bCMS_state_machine.current_state(),"FSC");
         } else {
             throw new Statechart_exception("Fire truck route " + route_name + " does not exist...");
         }
@@ -503,7 +503,7 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
         _last_police_vehicle_route = service.getRoute(route_name); // On construit un entity bean 'Route' avec sa clef 'route_name' ; on le cherche dans la base...
         if (_last_police_vehicle_route != null) {
             _bCMS_state_machine.run_to_completion(_Route_for_police_vehicles);
-            service.createEvent(_Route_for_police_vehicles, _bCMS_state_machine.current_state());
+            service.createEvent(_Route_for_police_vehicles, _bCMS_state_machine.current_state(),"PSC");
         } else {
             throw new Statechart_exception("Police vehicle route " + route_name + " does not exist...");
         }
@@ -547,7 +547,7 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
         ft = service.getFireTruck(fire_truck);
         
         if(ft != null){
-            service.createEvent(_Fire_truck_dispatched, _bCMS_state_machine.current_state());
+            service.createEvent(_Fire_truck_dispatched, _bCMS_state_machine.current_state(),"FSC");
             service.createSessionFireTruck(ft, 0);
             
         }   

@@ -18,7 +18,7 @@ import javax.ejb.Local;
  */
 @Local
 public interface BCMSBDLocal {
-    public void createEvent(String request, String exec);
+    public void createEvent(String request, String exec, String caller);
     public void createSession();
     public void createSessionFireTruck(FireTruck ft, int id);
     public void FSC_connected();
