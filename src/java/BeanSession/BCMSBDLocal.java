@@ -6,6 +6,7 @@
 package BeanSession;
 
 import BeanEntity.BcmsSession;
+import BeanEntity.Event;
 import BeanEntity.FireTruck;
 import BeanEntity.PoliceVehicle;
 import BeanEntity.Route;
@@ -28,7 +29,8 @@ public interface BCMSBDLocal {
     public Long countPoliceVehicle();
     
     public List<FireTruck> getFireTruck();
-    public List<FireTruck> getEvent();
+    public List<Event> getEvent();
+    public List<Event> getEventBySession();
     public Route getRoute(String name);
     public FireTruck getFireTruck(String name);
     public PoliceVehicle getPoliceVehicule(String name);
@@ -39,4 +41,6 @@ public interface BCMSBDLocal {
     public boolean sessionIsCreated();
     public boolean FSC_is_connected();
     public boolean PSC_is_connected();
+    
+    public boolean sessionHaveEvent();
 }

@@ -97,8 +97,13 @@ public class BCMSBD implements BCMSBDLocal {
     }
     
     @Override
-    public List<FireTruck> getEvent() {
+    public List<Event> getEvent() {
         return _entity_manager.createNamedQuery("Event.findAll").getResultList();
+    }
+    
+    @Override
+    public List<Event> getEventBySession() {
+        return _entity_manager.createNamedQuery("Event.findBySessionId").setParameter("sessionId", _session).getResultList();
     }
     
     @Override
@@ -141,5 +146,11 @@ public class BCMSBD implements BCMSBDLocal {
     @Override
     public boolean PSC_is_connected() {
         return PSC_connected;
+    }
+
+    @Override
+    public boolean sessionHaveEvent() {
+        System.out.println((Long)_entity_manager.createNamedQuery("Event.countEventBySessionId").setParameter("sessionId", _session).getSingleResult()>0);
+        return (Long)_entity_manager.createNamedQuery("Event.countEventBySessionId").setParameter("sessionId", _session).getSingleResult()>0;
     }
 }
