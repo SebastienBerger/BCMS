@@ -31,7 +31,7 @@
             </header>
             <div class="row">
                 <div class="col-lg-12">
-                    <c:if test="#{bcms.service.sessionIsCreated()}"><p style="font-size: 18px">A session is ever create</p></c:if>
+                    <c:if test="#{bcms.service.sessionIsCreated()}"><p style="font-size: 18px">A session is running</p></c:if>
                     <c:if test="#{!bcms.service.sessionIsCreated()}"><p style="font-size: 18px">#{bcms.service.createSession()} Session create</p></c:if>
                 </div>
             </div>
@@ -59,7 +59,7 @@
                         <div class="panel-body" id="fire">
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <c:if test="#{bcms.service.FSC_is_connected()}"><h1>Fireman are ever connected</h1><br/>
+                                    <c:if test="#{bcms.service.FSC_is_connected()}"><p style="font-size: 18px">Fireman are ever connected</p><br/>
                                     <a title="fire" id="fireSession.xhtml" href="#" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-chevron-right"></span> Follow the session</a></c:if>
                                     <c:if test="#{!bcms.service.FSC_is_connected()}">
                                         <a title="fire" id="fireConnected.xhtml" href="#" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-off"></span> Fireman connection</a>
