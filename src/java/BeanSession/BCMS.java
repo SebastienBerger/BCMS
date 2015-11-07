@@ -17,17 +17,11 @@ import BeanEntity.*;
 import com.pauware.pauware_engine._Core.*;
 import com.pauware.pauware_engine._Exception.*;
 import com.pauware.pauware_engine._Java_EE.*;
-import com.sun.xml.wss.impl.config.ConfigurationConstants;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Startup;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+
 
 final class Timeout_log {
 
