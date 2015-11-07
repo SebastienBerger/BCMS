@@ -21,6 +21,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Startup;
+import javax.faces.bean.ManagedBean;
 
 
 final class Timeout_log {
@@ -37,11 +38,14 @@ final class Timeout_log {
     }
 }
 
+@ManagedBean(name = "bcms")
 @Singleton
 @Startup
 public class BCMS extends Timer_monitor implements FSC, PSC {
     @EJB
     private BCMSBDLocal service;
+    public BCMSBDLocal getService(){return service;};
+    public void setService(BCMSBDLocal s){service = s;}
     private BcmsSession _session;
     private Route _last_fire_truck_route;
     private Route _last_police_vehicle_route;
@@ -380,14 +384,10 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
              * End of fake arguments
              */
             _bCMS_state_machine.fires(_Close, _Completion_of_objectives, _End_of_crisis);
-            
-            //Initiatlisation of BCMS session
-            service.createSession();
-            
 
             _bCMS_state_machine.start();
             
-            Long lcountFT =  service.countFireTruck();
+            /*Long lcountFT =  service.countFireTruck();
             Long lcountPV =  service.countPoliceVehicle();
             int countFT = (lcountFT).intValue();
             int countPV = (lcountPV).intValue();
@@ -396,7 +396,7 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
             PSC_connection_request();
             
             state_fire_truck_number(countFT);
-            state_police_vehicle_number(countPV);
+            state_police_vehicle_number(countPV);*/
             
             //route_for_fire_trucks("Route1");
             System.out.println("APRESS ENCORE");
@@ -454,12 +454,14 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
             service.createEvent(_Fire_truck_dispatched, _bCMS_state_machine.current_state());
      
         }
+        service.FSC_connected();
     }
 
     @Override
     public void PSC_connection_request() throws Statechart_exception {
         _bCMS_state_machine.run_to_completion(_PSC_connection_request);
-        service.createEvent(_PSC_connection_request, _Close);
+        service.createEvent(_PSC_connection_request, _bCMS_state_machine.current_state());
+        service.PSC_connected();
 
     }
 

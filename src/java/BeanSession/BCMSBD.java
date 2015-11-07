@@ -30,7 +30,9 @@ public class BCMSBD implements BCMSBDLocal {
     @PersistenceContext(name="BCMSPU")
     private EntityManager _entity_manager;
     
-    private BcmsSession _session;
+    private BcmsSession _session = null;
+    private boolean FSC_connected = false;
+    private boolean PSC_connected = false;
     
     private String date(){
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
@@ -69,6 +71,16 @@ public class BCMSBD implements BCMSBDLocal {
     }
 
     @Override
+    public void FSC_connected() {
+        FSC_connected = true;
+    }
+
+    @Override
+    public void PSC_connected() {
+        PSC_connected = true;
+    }
+    
+    @Override
     public Long countFireTruck() {
         return (Long)_entity_manager.createNamedQuery("FireTruck.countFireTruck").getSingleResult();
     }
@@ -81,6 +93,11 @@ public class BCMSBD implements BCMSBDLocal {
     @Override
     public List<FireTruck> getFireTruck() {
         return _entity_manager.createNamedQuery("FireTruck.findAll").getResultList();
+    }
+    
+    @Override
+    public List<FireTruck> getEvent() {
+        return _entity_manager.createNamedQuery("Event.findAll").getResultList();
     }
     
     @Override
@@ -110,9 +127,18 @@ public class BCMSBD implements BCMSBDLocal {
         _entity_manager.persist(_session); 
     }
 
+    @Override
+    public boolean sessionIsCreated() {
+        return _session != null;
+    }
 
+    @Override
+    public boolean FSC_is_connected() {
+        return FSC_connected;
+    }
 
-
-
-
+    @Override
+    public boolean PSC_is_connected() {
+        return PSC_connected;
+    }
 }

@@ -21,12 +21,22 @@ public interface BCMSBDLocal {
     public void createEvent(String request, String exec);
     public void createSession();
     public void createSessionFireTruck(FireTruck ft, int id);
+    public void FSC_connected();
+    public void PSC_connected();
+    
     public Long countFireTruck();
     public Long countPoliceVehicle();
+    
     public List<FireTruck> getFireTruck();
+    public List<FireTruck> getEvent();
     public Route getRoute(String name);
     public FireTruck getFireTruck(String name);
     public PoliceVehicle getPoliceVehicule(String name);
+    
     public void setNbFireTruck(int nb);
     public void setNbPoliceVehicule(int nb);
+    
+    public boolean sessionIsCreated();
+    public boolean FSC_is_connected();
+    public boolean PSC_is_connected();
 }

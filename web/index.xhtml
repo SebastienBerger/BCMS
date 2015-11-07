@@ -31,21 +31,21 @@
             </header>
             <div class="row">
                 <div class="col-lg-12">
-                    <!--<c:if test="#{bcms.isCreateSession()}"><p style="font-size: 18px">#{bcms.createSession()}Session create</p></c:if>
-                    <c:if test="#{!bcms.isCreateSession()}"><p style="font-size: 18px">A session is ever create</p></c:if>-->
+                    <c:if test="#{bcms.service.sessionIsCreated()}"><p style="font-size: 18px">A session is ever create</p></c:if>
+                    <c:if test="#{!bcms.service.sessionIsCreated()}"><p style="font-size: 18px">#{bcms.service.createSession()} Session create</p></c:if>
                 </div>
             </div>
             <div class="row">
-                <!--<div class="col-sm-6">
+                <div class="col-sm-6">
                     <div class="panel panel-primary">
                         <div class="panel-heading" style="font-size: 20px">Police
                         </div>
                         <div class="panel-body"  id="police">
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <c:if test="#{bcms.a_PSC_session_is_active()}"><p style="font-size: 18px">Policeman are ever connected</p><br/>
+                                    <c:if test="#{bcms.service.PSC_is_connected()}"><p style="font-size: 18px">Policeman are ever connected</p><br/>
                                     <a title="police" id="policeSession.xhtml" href="#" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-chevron-right"></span> Follow the session</a></c:if>
-                                    <c:if test="#{!bcms.a_PSC_session_is_active()}">
+                                    <c:if test="#{!bcms.service.PSC_is_connected()}">
                                         <a title="police" id="policeConnected.xhtml" href="#" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-off"></span> Police connection</a>
                                     </c:if>
                                 </div>
@@ -59,16 +59,16 @@
                         <div class="panel-body" id="fire">
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <c:if test="#{bcms.a_FSC_session_is_active()}"><h1>Fireman are ever connected</h1><br/>
+                                    <c:if test="#{bcms.service.FSC_is_connected()}"><h1>Fireman are ever connected</h1><br/>
                                     <a title="fire" id="fireSession.xhtml" href="#" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-chevron-right"></span> Follow the session</a></c:if>
-                                    <c:if test="#{!bcms.a_FSC_session_is_active()}">
+                                    <c:if test="#{!bcms.service.FSC_is_connected()}">
                                         <a title="fire" id="fireConnected.xhtml" href="#" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-off"></span> Fireman connection</a>
                                     </c:if>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>-->
+                </div>
             </div>
             <div class="row">
                 <div class="col-sm-12">
@@ -95,7 +95,7 @@
                                             <th>Session Id</th></tr>
                                     </thead>
                                     <tbody>
-                                        <ui:repeat var="t" value="#{bcms.event}" varStatus="status">
+                                        <ui:repeat var="t" value="#{bcms.service.getEvent()}" varStatus="status">
                       
                                                 <tr class="gradeA odd" role="row">
                                                     <td><img src="#{t.caller eq 'FSC' ? 'img/firemen.png' : (t.caller eq 'PSC' ? 'img/police.png' : '')}" class="img-circle" /></td>
