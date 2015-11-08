@@ -121,6 +121,12 @@ public class BCMSBD implements BCMSBDLocal {
         return _entity_manager.find(PoliceVehicle.class, name);
     }
 
+    
+    @Override
+    public List<BcmsSession> getAllSession() {
+        return _entity_manager.createNamedQuery("BcmsSession.findAll").getResultList();
+    }
+    
     @Override
     public void setNbFireTruck(int nb) {
         _session.setNbTruckF(nb);
@@ -153,4 +159,5 @@ public class BCMSBD implements BCMSBDLocal {
         System.out.println((Long)_entity_manager.createNamedQuery("Event.countEventBySessionId").setParameter("sessionId", _session).getSingleResult()>0);
         return (Long)_entity_manager.createNamedQuery("Event.countEventBySessionId").setParameter("sessionId", _session).getSingleResult()>0;
     }
+
 }

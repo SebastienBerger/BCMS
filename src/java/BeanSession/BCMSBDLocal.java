@@ -34,6 +34,7 @@ public interface BCMSBDLocal {
     public Route getRoute(String name);
     public FireTruck getFireTruck(String name);
     public PoliceVehicle getPoliceVehicule(String name);
+    public List<BcmsSession> getAllSession();
     
     public void setNbFireTruck(int nb);
     public void setNbPoliceVehicule(int nb);
