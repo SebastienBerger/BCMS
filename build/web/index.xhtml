@@ -21,22 +21,7 @@
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-lg-12" id="police">
-                                    <c:if test="#{!bcms.client.getPoliceSessionState()}">
-                                        <h:form>
-                                            <h:commandLink action="#{bcms.connectPoliceman()}" class="btn btn-lg btn-default"> <span class="glyphicon glyphicon-off"></span>  Police connection</h:commandLink>
-                                        </h:form>
-                                    </c:if>
-                                    <c:if test="#{bcms.client.getPoliceSessionState() and !bcms.client.isPoliceSession()}">
-                                        <p style="font-size: 18px">Fireman are ever connected</p><br/>
-                                        <h:form>
-                                            <h:commandLink action="folowPolice" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-chevron-right"></span> Follow the session</h:commandLink>
-                                        </h:form>
-                                    </c:if>
-                                    <c:if test="#{bcms.client.isPoliceSession()}">
-                                        <iframe src="policeConnected.xhtml">
-                                        
-                                        </iframe>
-                                    </c:if>
+                                    <iframe src="policeConnected.xhtml"></iframe>
                                 </div>
                             </div>
                         </div>
@@ -49,22 +34,7 @@
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-lg-12" id="fire">
-                                    <c:if test="#{!bcms.client.getFireSessionState()}">
-                                        <h:form>
-                                            <h:commandLink action="#{bcms.connectFireman()}" class="btn btn-lg btn-default"> <span class="glyphicon glyphicon-off"></span>  Fire connection</h:commandLink>
-                                        </h:form>
-                                    </c:if>
-                                    <c:if test="#{bcms.client.getFireSessionState() and !bcms.client.isFireSession()}">
-                                        <p style="font-size: 18px">Fireman are ever connected</p><br/>
-                                        <h:form>
-                                            <h:commandLink action="folowFireman" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-chevron-right"></span> Follow the session</h:commandLink>
-                                        </h:form>
-                                    </c:if>
-                                    <c:if test="#{bcms.client.isFireSession()}">
-                                        <iframe src="fireConnected.xhtml">
-                                        
-                                        </iframe>
-                                    </c:if>
+                                    <iframe src="fireConnected.xhtml"></iframe>
                                 </div>
                             </div>
                         </div>

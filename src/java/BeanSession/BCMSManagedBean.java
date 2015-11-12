@@ -57,7 +57,7 @@ public class BCMSManagedBean{
         } catch (Statechart_exception ex) {
                 Logger.getLogger(BCMSManagedBean.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return "index?faces-redirect=true";
+        return "fireConnected?faces-redirect=true";
     }
     
     public String connectPoliceman(){
@@ -74,7 +74,7 @@ public class BCMSManagedBean{
         } catch (Statechart_exception ex) {
                 Logger.getLogger(BCMSManagedBean.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return "index?faces-redirect=true";
+        return "policeConnected?faces-redirect=true";
     }
     
     public void deconnectPoliceman(){
