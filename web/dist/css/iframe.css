@@ -13,3 +13,12 @@ iframe{
     width : 100%;
     height: 400px;
 }
+#frame {
+    text-align:center;
+    margin : 0 auto;
+    height:100%;
+    width:100%;
+}
+#formulaire{
+    text-align:left;
+}

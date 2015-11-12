@@ -6,7 +6,7 @@
       xmlns:c="http://java.sun.com/jsp/jstl/core">
     <ui:include src="header.xhtml"/>
 <h:body>
-<div class="dataTable_wrapper">
+<div id="frame">
     <c:if test="#{!bcms.client.getPoliceSessionState()}">
         <h:form>
             <h:commandLink action="#{bcms.connectPoliceman()}" class="btn btn-lg btn-default"> <span class="glyphicon glyphicon-off"></span>  Police connection</h:commandLink>
@@ -19,7 +19,7 @@
         </h:form>
     </c:if>
     <c:if test="#{bcms.client.isPoliceSession()}">
-        <h:form class="form-horizontal">
+        <h:form id="formulaire" class="form-horizontal">
         <fieldset>
            
         <!-- Form Name -->

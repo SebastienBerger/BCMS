@@ -6,7 +6,7 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <ui:include src="header.xhtml"/>
 <h:body>
-<div class="dataTable_wrapper">
+<div id="frame">
 
     <c:if test="#{!bcms.client.getFireSessionState()}">
         <h:form>
@@ -22,7 +22,7 @@
     <c:if test="#{bcms.client.isFireSession()}">
 
                                     
-        <h:form class="form-horizontal">
+        <h:form id="formulaire" class="form-horizontal">
         <fieldset>
 
         <!-- Form Name -->
