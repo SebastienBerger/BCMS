@@ -18,13 +18,8 @@ import javax.ejb.Local;
  * @author berger
  */
 @Local
-public interface BCMSBDLocal {
-    public void createEvent(String request, String exec, String caller);
-    public void createSession();
-    public void createSessionFireTruck(FireTruck ft, int id);
-    public void FSC_connected();
-    public void PSC_connected();
-    
+public interface BCMSDaoLocalReader {
+
     public Long countFireTruck();
     public Long countPoliceVehicle();
     
@@ -40,8 +35,7 @@ public interface BCMSBDLocal {
     public void setNbPoliceVehicule(int nb);
     
     public boolean sessionIsCreated();
-    public boolean FSC_is_connected();
-    public boolean PSC_is_connected();
     
     public boolean sessionHaveEvent();
+
 }

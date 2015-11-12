@@ -17,6 +17,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Singleton;
+import javax.faces.bean.ManagedBean;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -25,14 +26,13 @@ import javax.persistence.PersistenceContext;
  * @author berger
  */
 @Singleton
-public class BCMSBD implements BCMSBDLocal {
+public class BCMSDao implements BCMSDaoLocalReader, BCMSDaoLocalWriter {
 
     @PersistenceContext(name="BCMSPU")
     private EntityManager _entity_manager;
     
-    private BcmsSession _session = null;
-    private boolean FSC_connected = false;
-    private boolean PSC_connected = false;
+    private static BcmsSession _session = null;
+
     
     private String date(){
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
@@ -69,16 +69,6 @@ public class BCMSBD implements BCMSBDLocal {
             bcmsft.setFireTruckStatus("Idle");
             bcmsft.setBsftId(date()+id);
             _entity_manager.persist(bcmsft);
-    }
-
-    @Override
-    public void FSC_connected() {
-        FSC_connected = true;
-    }
-
-    @Override
-    public void PSC_connected() {
-        PSC_connected = true;
     }
     
     @Override
@@ -142,16 +132,6 @@ public class BCMSBD implements BCMSBDLocal {
     @Override
     public boolean sessionIsCreated() {
         return _session != null;
-    }
-
-    @Override
-    public boolean FSC_is_connected() {
-        return FSC_connected;
-    }
-
-    @Override
-    public boolean PSC_is_connected() {
-        return PSC_connected;
     }
 
     @Override

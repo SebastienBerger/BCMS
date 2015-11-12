@@ -17,11 +17,14 @@ import BeanEntity.*;
 import com.pauware.pauware_engine._Core.*;
 import com.pauware.pauware_engine._Exception.*;
 import com.pauware.pauware_engine._Java_EE.*;
+import static com.sun.faces.facelets.util.Path.context;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Startup;
 import javax.faces.bean.ManagedBean;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpSession;
 
 
 final class Timeout_log {
@@ -38,15 +41,15 @@ final class Timeout_log {
     }
 }
 
-@ManagedBean(name = "bcms")
 @Singleton
-@Startup
+//@Startup
 public class BCMS extends Timer_monitor implements FSC, PSC {
+
     @EJB
-    private BCMSBDLocal service;
-    public BCMSBDLocal getService(){return service;};
-    public void setService(BCMSBDLocal s){service = s;}
-    private BcmsSession _session;
+    private BCMSDaoLocalWriter service;
+    @EJB
+    private BCMSDaoLocalReader serviceR;
+
     private Route _last_fire_truck_route;
     private Route _last_police_vehicle_route;
     private java.util.LinkedList<Timeout_log> _timeout_log;
@@ -386,7 +389,7 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
             _bCMS_state_machine.fires(_Close, _Completion_of_objectives, _End_of_crisis);
 
             _bCMS_state_machine.start();
-            
+            service.createSession();
             /*Long lcountFT =  service.countFireTruck();
             Long lcountPV =  service.countPoliceVehicle();
             int countFT = (lcountFT).intValue();
@@ -409,6 +412,7 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
 
     @PreDestroy
     public void stop() {
+        service = null;
         try {
             _bCMS_state_machine.stop();
         } catch (Statechart_exception e) {
@@ -444,7 +448,7 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
         _bCMS_state_machine.run_to_completion(_FSC_connection_request);
         service.createEvent(_FSC_connection_request,_bCMS_state_machine.current_state(),"FSC");
         
-        List<FireTruck> listeFireTruck = service.getFireTruck();
+        List<FireTruck> listeFireTruck = serviceR.getFireTruck();
         for(int i=0; i<listeFireTruck.size(); i++){
             System.out.println(listeFireTruck.get(i));
             _bCMS_state_machine.run_to_completion(_Fire_truck_dispatched);
@@ -454,15 +458,12 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
             service.createEvent(_Fire_truck_dispatched, _bCMS_state_machine.current_state(),"FSC");
      
         }
-        service.FSC_connected();
     }
 
     @Override
     public void PSC_connection_request() throws Statechart_exception {
         _bCMS_state_machine.run_to_completion(_PSC_connection_request);
         service.createEvent(_PSC_connection_request, _bCMS_state_machine.current_state(),"PSC");
-        service.PSC_connected();
-
     }
 
     @Override
@@ -470,7 +471,7 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
         _bCMS_state_machine.fires(_State_fire_truck_number, _Crisis_details_exchange, _Number_of_fire_truck_defined, true, this, "set_number_of_fire_truck_required", new Object[]{number_of_fire_truck_required});
         _bCMS_state_machine.fires(_State_fire_truck_number, _Number_of_police_vehicle_defined, _Route_plan_development, true, this, "set_number_of_fire_truck_required", new Object[]{number_of_fire_truck_required});
         _bCMS_state_machine.run_to_completion(_State_fire_truck_number);
-        service.setNbFireTruck(number_of_fire_truck_required);
+        serviceR.setNbFireTruck(number_of_fire_truck_required);
     }
 
     @Override
@@ -478,14 +479,14 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
         _bCMS_state_machine.fires(_State_police_vehicle_number, _Crisis_details_exchange, _Number_of_police_vehicle_defined, true, this, "set_number_of_police_vehicle_required", new Object[]{number_of_police_vehicle_required});
         _bCMS_state_machine.fires(_State_police_vehicle_number, _Number_of_fire_truck_defined, _Route_plan_development, true, this, "set_number_of_police_vehicle_required", new Object[]{number_of_police_vehicle_required});
         _bCMS_state_machine.run_to_completion(_State_police_vehicle_number);
-        service.setNbPoliceVehicule(number_of_police_vehicle_required);
+        serviceR.setNbPoliceVehicule(number_of_police_vehicle_required);
         
     }
 
     @Override
     public void route_for_fire_trucks(String route_name) throws Statechart_exception {
         _last_fire_truck_route = null;
-        _last_fire_truck_route = service.getRoute(route_name);// On construit un entity bean 'Route' avec sa clef 'route_name' ; on le cherche dans la base...
+        _last_fire_truck_route = serviceR.getRoute(route_name);// On construit un entity bean 'Route' avec sa clef 'route_name' ; on le cherche dans la base...
         System.out.println("                        ");
         System.out.println(_last_fire_truck_route);
         if (_last_fire_truck_route != null) {
@@ -500,7 +501,7 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
     @Override
     public void route_for_police_vehicles(String route_name) throws Statechart_exception {
         _last_police_vehicle_route = null;
-        _last_police_vehicle_route = service.getRoute(route_name); // On construit un entity bean 'Route' avec sa clef 'route_name' ; on le cherche dans la base...
+        _last_police_vehicle_route = serviceR.getRoute(route_name); // On construit un entity bean 'Route' avec sa clef 'route_name' ; on le cherche dans la base...
         if (_last_police_vehicle_route != null) {
             _bCMS_state_machine.run_to_completion(_Route_for_police_vehicles);
             service.createEvent(_Route_for_police_vehicles, _bCMS_state_machine.current_state(),"PSC");
@@ -544,7 +545,7 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
         _bCMS_state_machine.run_to_completion(_Fire_truck_dispatched);
         
         FireTruck ft = new FireTruck();
-        ft = service.getFireTruck(fire_truck);
+        ft = serviceR.getFireTruck(fire_truck);
         
         if(ft != null){
             service.createEvent(_Fire_truck_dispatched, _bCMS_state_machine.current_state(),"FSC");
