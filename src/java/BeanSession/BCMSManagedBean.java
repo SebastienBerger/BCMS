@@ -13,7 +13,9 @@ import javax.ejb.Singleton;
 import javax.ejb.Stateless;
 import javax.inject.Named;
 import javax.enterprise.context.Dependent;
+import javax.faces.application.ViewHandler;
 import javax.faces.bean.ManagedBean;
+import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpSession;
 
@@ -24,7 +26,14 @@ import javax.servlet.http.HttpSession;
 @ManagedBean(name = "bcms")
 @Singleton
 public class BCMSManagedBean{
-
+       static Integer i=1;
+       public int getI(){
+           i++;
+           return i;
+       }
+       public void setI(){
+          i=0;
+       }
     @EJB
     private FSC fire;
     @EJB
@@ -83,5 +92,53 @@ public class BCMSManagedBean{
 
     public void deconnectFireman(){
         client.deleteFireSessionHttp();
+    }
+    
+    public String actionFiremanConnect(){
+        String ch ="";
+        if(!client.getFireSessionState())
+            ch = connectFireman();
+        else if(client.getFireSessionState() && !client.isFireSession())
+            ch = "folowFireman";
+           
+        return ch;
+        
+    }
+    public String actionPolicemanConnect(){
+        String ch ="";
+        if(!client.getPoliceSessionState())
+            ch = connectPoliceman();
+        else if(client.getPoliceSessionState() && !client.isPoliceSession())
+            ch = "folowFireman";
+           
+        return ch;
+        
+    }
+    public String runOrFollowFireSession(){
+        String ch ="";
+        if(!client.getFireSessionState())
+            ch = "Fire connexion" ;
+        else if(client.getFireSessionState() && !client.isFireSession())
+            ch = "Follow the session";
+           
+        return ch;  
+    }
+    public String runOrFollowPoliceSession(){
+        String ch ="";
+        if(!client.getPoliceSessionState())
+            ch = "Police connexion" ;
+        else if(client.getPoliceSessionState() && !client.isPoliceSession())
+            ch = "Follow the session";
+           
+        return ch;  
+    }
+    public String waitRoute(){
+
+        String r = null;
+        while(i == 0){
+            i++;
+            r = i.toString();
+        }
+        return r;
     }
 }

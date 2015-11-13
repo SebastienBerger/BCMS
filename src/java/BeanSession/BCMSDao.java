@@ -140,4 +140,9 @@ public class BCMSDao implements BCMSDaoLocalReader, BCMSDaoLocalWriter {
         return (Long)_entity_manager.createNamedQuery("Event.countEventBySessionId").setParameter("sessionId", _session).getSingleResult()>0;
     }
 
+    @Override
+    public List<String> getNameRoutes() {
+        return _entity_manager.createNamedQuery("Route.findAllName").getResultList();
+    }
+
 }

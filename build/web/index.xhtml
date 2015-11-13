@@ -3,14 +3,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
         xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:c="http://java.sun.com/jsp/jstl/core">
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui">
     <ui:include src="header.xhtml"/>
     <h:body>
+        #{bcms.client.initClients()}
         <ui:include src="navigate.xhtml"/>
         <div class="containt" style="padding-top: 60px; padding-left: 20px; padding-right: 20px">
             <div class="row">
                 <div class="col-lg-12">
-                    <h:outputText style="font-size: 18px" value="#{bcms.stateSession}" />
+                    <h:form>
+                        <p:poll id="poll" interval="1" rendered="#{bcms.stateSession eq 'Session create'}" update="stateSession"/>
+                    <h:outputText id="stateSession" style="font-size: 18px" value="#{bcms.stateSession}" />
+                    </h:form>
                 </div>
             </div>
             <div class="row">

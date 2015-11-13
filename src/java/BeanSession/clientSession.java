@@ -5,9 +5,13 @@
  */
 package BeanSession;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
+import javax.faces.application.ViewHandler;
 import javax.faces.bean.ManagedBean;
+import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpSession;
 
@@ -24,8 +28,13 @@ public class clientSession implements clientSessionLocal {
     private static boolean policeSessionState = false;
     private static HttpSession _fireSession;
     private static HttpSession _policeSession;  
-    
+    private static List<FacesContext> clients;
 
+    public void initClients(){
+        if(clients == null)
+            clients = new ArrayList<FacesContext>();
+        clients.add(FacesContext.getCurrentInstance());
+    }
     @Override
     public boolean getFireSession(){
         return fireSession;
@@ -123,4 +132,16 @@ public class clientSession implements clientSessionLocal {
         _policeSession = null;
     }
 
+    
+    @Override
+    public void refresh(){
+        for(int i = 0 ; i < clients.size() ; i++){
+    FacesContext context = clients.get(i);
+    String viewId = context.getViewRoot().getViewId();
+    ViewHandler handler = context.getApplication().getViewHandler();
+    UIViewRoot root = handler.createView(context, viewId);
+    root.setViewId(viewId);
+    context.setViewRoot(root);
+        }
+}
 }

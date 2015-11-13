@@ -39,4 +39,8 @@ public interface clientSessionLocal {
     public void setFireSessionState(boolean b);
 
     public void deletePoliceSessionHttp();
+    
+    public void refresh();
+
+    public void initClients();
 }
