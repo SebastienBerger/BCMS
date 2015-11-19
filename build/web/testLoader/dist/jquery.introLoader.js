@@ -434,7 +434,7 @@
             var styleClass = 'theme-'+ animOpt.style;
             if (animOpt.fixed === false) {
                 $(element).addClass('absolute');
-                $(element).parent().css({'position':'relative','overflow':'hidden'});
+                $(element).parent().css({'overflow':'hidden'});
             }
             $(element).addClass('introLoader '+ elementClass +' ' + styleClass);
         }// end of animationOpening()

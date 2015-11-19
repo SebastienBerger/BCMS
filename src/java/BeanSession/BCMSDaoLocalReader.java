@@ -30,6 +30,7 @@ public interface BCMSDaoLocalReader {
     public FireTruck getFireTruck(String name);
     public PoliceVehicle getPoliceVehicule(String name);
     public List<BcmsSession> getAllSession();
+    public List<Route> getRoutes();
     public List<String> getNameRoutes();
     
     public void setNbFireTruck(int nb);

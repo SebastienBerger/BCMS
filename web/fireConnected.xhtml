@@ -31,9 +31,9 @@
 
         <!-- Select Basic -->
         <div class="form-group">
-          <label class="col-md-4 control-label" for="numberTruck">Number of truck</label>
+          <h:outputLabel for="nbTruck" class="col-md-4 control-label" value="Number of truck"/>
           <div class="col-md-4">
-              <h:selectOneMenu id="nbTruck" class="form-control">
+              <h:selectOneMenu id="nbTruck" class="form-control" value="#{bcms.nbFireVehicule}">
                   <c:forEach begin="1" end="#{bcms.dao.countFireTruck()}" var="i">
                       <f:selectItem itemLabel="#{i}" itemValue="#{i}"/>
                   </c:forEach>
@@ -41,25 +41,43 @@
           </div>
         </div>
         <h:form>
-
-            <p:poll id="poll" interval="2" update="serverDate" oncomplete="#{bcms.getI() eq 1?'stopPlugin()':''}"/>
-            <div id="ajaxTest" style="width:auto; height:50px;">
-            En attente des routes
-            <div id="dynElement">
-                #{bcms.getI()}
-                <h:outputText id="serverDate" style="font-size:16px" value="Server Date: #{bcms.getI()}" />
+            <p:poll id="pollroad" interval="1" update="road" ></p:poll>
+            <p:poll id="pollroadot" interval="1" update="roadot" ></p:poll>
+            <div id="loaderStyle">
+                <div id="dynElement" style="margin-top: 50px;">
+                </div>
             </div>
-        </div>
-            
+            <h:outputText id="roadot" value="#{bcms.roadNotReceived()?'Waiting for police roads':'Police roads'}"/>
+            <h:selectManyListbox id="road"  class="form-control">
+                <c:if test="#{bcms.loaderIsRunning() and (bcms.waitRoute() eq 'stopPlugin()')}">
+                    #{bcms.setLoaderRunning(false)}
+                <script>#{bcms.waitRoute()}</script>
+                </c:if>
+                <f:selectItems value="#{bcms.roadForPolice}"/>
+            </h:selectManyListbox>
         </h:form>
-        <h:commandButton action="#{bcms.setI()}"></h:commandButton>
+        <h:form>
+            <p:poll id="pollroad" interval="1" update="road" ></p:poll>
+            <p:poll id="pollroadot" interval="1" update="roadot" ></p:poll>
+            <div id="loaderStyle">
+                <div id="dynElement" style="margin-top: 50px;">
+                </div>
+            </div>
+            <h:outputText id="roadot" value="#{bcms.roadNotReceived()?'Waiting for fire roads':'Fire roads'}"/>
+            <h:selectManyListbox id="road"  class="form-control">
+                <c:if test="#{bcms.loaderIsRunning() and (bcms.waitRoute() eq 'stopPlugin()')}">
+                    #{bcms.setLoaderRunning(false)}
+                <script>#{bcms.waitRoute()}</script>
+                </c:if>
+                <f:selectItems value="#{bcms.roadForFire}"/>
+            </h:selectManyListbox>
+        </h:form>
         <!-- Button (Double) -->
         <div class="form-group ">
-          <label class="col-md-4 control-label" for="button1id"></label>
           <div class="col-md-8 pull-right">
 
               
-              <h:commandButton action="fireSession" class="btn btn-primary" style="margin-right:5px;" value="Run session"></h:commandButton>
+              <h:commandButton action="#{bcms.goToFireSession()}" class="btn btn-primary" style="margin-right:5px;" value="Run session"></h:commandButton>
               <h:commandButton action="#{bcms.deconnectFireman()}" class="btn btn-danger" value="Close session"></h:commandButton>
           </div>
         </div>
@@ -80,28 +98,30 @@ $(window).load(function() {
         <script src="testLoader/dist/helpers/jquery.easing.1.3.js"></script>
         <script src="testLoader/dist/helpers/spin.min.js"></script>
         <script src="testLoader/dist/jquery.introLoader.js"></script>
-    <script>
-$(document).on('ready', function() {          
-
-                
-              
-                    $("#dynElement").introLoader({
-                        animation: {
-                            name: 'simpleLoader',
-                            options: {
-                                stop: false,
-                                fixed: false
-                            }
-                        }
-                    });
-
-                
-			});
-                        function stopPlugin(){
-                            var loader = $('#dynElement').data('introLoader');
-                            loader.stop();    
-                        }
+        
+<script>
+function startPlugin() {          
+    $("#dynElement").introLoader({
+        animation: {
+            name: 'simpleLoader',
+            options: {
+                stop: false,
+                fixed: false
+            }
+        }
+    });
+}
+function stopPlugin(){
+    var loader = $('#dynElement').data('introLoader');
+    loader.stop();    
+}
             
 </script>
+        
+        <c:if test="#{bcms.roadNotReceived()}"><script> $(document).on('ready', startPlugin()); </script></c:if>
+        
+        <style>
+             #loaderStyle{width:100%; height:50px; position: absolute; margin-top: 40px;}
+        </style>
 </h:body>
 </html>

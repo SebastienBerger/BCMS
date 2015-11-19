@@ -5,9 +5,13 @@
  */
 package BeanSession;
 
+import BeanEntity.Route;
 import com.pauware.pauware_engine._Exception.Statechart_exception;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.Stateless;
@@ -26,14 +30,7 @@ import javax.servlet.http.HttpSession;
 @ManagedBean(name = "bcms")
 @Singleton
 public class BCMSManagedBean{
-       static Integer i=1;
-       public int getI(){
-           i++;
-           return i;
-       }
-       public void setI(){
-          i=0;
-       }
+
     @EJB
     private FSC fire;
     @EJB
@@ -43,14 +40,36 @@ public class BCMSManagedBean{
     @EJB
     private BCMSDaoLocalReader dao;
 
+    static private int nbPoliceVehicule;
+    static private int nbFireVehicule;
+    static private String[] roadForPolice ={};
+    static private String[] roadForFire ={};
+    static private boolean loaderRunning = true;
     static private String stateSession = "Session not create";
     
     public FSC getFire(){ return fire;}
     public PSC getPolice(){ return police;}
     public String getStateSession(){return stateSession;}
-    public void setStateSession(String s){stateSession = s;}
     public clientSessionLocal getClient(){ return client;}
     public BCMSDaoLocalReader getDao(){return dao;}
+    public int getNbPoliceVehicule(){return nbPoliceVehicule;}
+    public int getNbFireVehicule(){return nbFireVehicule;}
+    public String[] getRoadForPolice(){
+        return roadForPolice;
+    }
+    public String[] getRoadForFire(){
+        return roadForFire;
+    }
+    
+    public void setStateSession(String s){stateSession = s;}
+    public void setNbPoliceVehicule(int i){nbPoliceVehicule = i;}
+    public void setNbFireVehicule(int i){nbFireVehicule = i;}
+    public void setRoadForPolice(String[] r){
+        roadForPolice = r;
+    }
+    public void setRoadForFire(String[] r){
+        roadForFire = r;
+    }
     
     public String connectFireman(){
         try {
@@ -132,13 +151,24 @@ public class BCMSManagedBean{
            
         return ch;  
     }
-    public String waitRoute(){
+    public String goToPoliceSession(){
 
-        String r = null;
-        while(i == 0){
-            i++;
-            r = i.toString();
-        }
-        return r;
+        return "policeSession";
+    }
+    public String waitRoute(){
+        System.out.println("------------------");
+        System.out.println("wait Road : "+ (roadForPolice.length == 0));
+        System.out.println("__________________");
+        return (roadForPolice.length == 0 || roadForFire.length == 0)? "" : "stopPlugin()";
+    }
+    
+    public boolean roadNotReceived(){
+        return (roadForPolice.length == 0 || roadForFire.length == 0);
+    }
+    public void setLoaderRunning(boolean b){
+        loaderRunning = b;
+    }
+    public boolean loaderIsRunning(){
+        return loaderRunning;
     }
 }

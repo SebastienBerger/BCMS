@@ -70,23 +70,18 @@ public class clientSession implements clientSessionLocal {
     
     @Override
     public boolean isPoliceSession(){
-        System.out.println("isPoliceSession()");
         if(_policeSession == null)
             return false;
         FacesContext facesContext = FacesContext.getCurrentInstance();
         HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(true);
-        System.out.println(_policeSession.getId()+" = "+session.getId());
-        System.out.println("policeSession = "+policeSession);
         return _policeSession.getId().equals(session.getId());
     }
     @Override
     public boolean isFireSession(){
-        System.out.println("isFireSession()");
         if(_fireSession == null)
             return false;
         FacesContext facesContext = FacesContext.getCurrentInstance();
         HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(true);
-        System.out.println(_fireSession.getId()+" = "+session.getId());
         return _fireSession.getId().equals(session.getId());
     }
     @Override

@@ -145,4 +145,9 @@ public class BCMSDao implements BCMSDaoLocalReader, BCMSDaoLocalWriter {
         return _entity_manager.createNamedQuery("Route.findAllName").getResultList();
     }
 
+    @Override
+    public List<Route> getRoutes() {
+        return _entity_manager.createNamedQuery("Route.findAll").getResultList();
+    }
+
 }

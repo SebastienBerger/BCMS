@@ -3,20 +3,27 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/src/java/BeanSession/BCMSDaoLocalReader.java</file>
             <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/web/policeConnected.xhtml</file>
             <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/src/java/BeanSession/BCMSDao.java</file>
             <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/web/index.xhtml</file>
             <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/web/fireSession.xhtml</file>
             <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/web/header.xhtml</file>
             <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/web/js/myAjax.js</file>
+            <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/src/java/BeanEntity/Route.java</file>
+            <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/web/crisisTable.xhtml</file>
+            <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/src/java/BeanSession/BCMSDaoLocalWriter.java</file>
             <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/src/java/BeanSession/BCMSManagedBean.java</file>
             <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/src/java/BeanSession/BCMS.java</file>
             <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/web/dist/css/iframe.css</file>
-            <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/web/police.xhtml</file>
+            <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/web/event.xhtml</file>
             <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/src/java/BeanSession/clientSession.java</file>
             <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/src/java/BeanSession/clientSessionLocal.java</file>
+            <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/src/java/BeanSession/PSC.java</file>
+            <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/src/java/BeanSession/FSC.java</file>
+            <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/web/policeSession.xhtml</file>
             <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/web/fireConnected.xhtml</file>
-            <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/web/affichageOptPolice.xhtml</file>
+            <file>file:/home/berger/Documents/masterTI/m2/BCMS/BCMS-master/BCMS/web/testLoader/demo/demo-simpleloader-startstop.html</file>
         </group>
     </open-files>
 </project-private>

@@ -28,9 +28,9 @@
 
         <!-- Select Basic -->
         <div class="form-group">
-          <label class="col-md-4 control-label" for="numberTruck">Number of vehicule</label>
+          <h:outputLabel for="nbVehicule" class="col-md-4 control-label" value="Number of vehicule"/>
           <div class="col-md-4">
-              <h:selectOneMenu id="nbVehicule" class="form-control">
+              <h:selectOneMenu id="nbVehicule" class="form-control" value="#{bcms.nbPoliceVehicule}">
                   <c:forEach begin="1" end="#{bcms.dao.countPoliceVehicle()}" var="i">
                       <f:selectItem itemLabel="#{i}" itemValue="#{i}"/>
                   </c:forEach>
@@ -39,17 +39,17 @@
         </div>
         <!-- Select Multiple -->
         <div class="form-group">
-          <label class="col-md-4 control-label" for="routes">Select road(s) for Police</label>
+          <h:outputLabel for="routesPolice" class="col-md-4 control-label" value="Select road(s) for Police"/>
           <div class="col-md-4">
-              <h:selectManyListbox id="routesPolice"  class="form-control">
+              <h:selectManyListbox id="routesPolice"  class="form-control" value="#{bcms.roadForPolice}">
                   <f:selectItems value="#{bcms.dao.getNameRoutes()}"/>
               </h:selectManyListbox>
           </div>
         </div>
         <div class="form-group">
-          <label class="col-md-4 control-label" for="routes">Select road(s) for Fire</label>
+          <h:outputLabel for="routesFire" class="col-md-4 control-label" value="Select road(s) for Fire"/>
           <div class="col-md-4">
-              <h:selectManyListbox id="routesFire"  class="form-control">
+              <h:selectManyListbox id="routesFire"  class="form-control"  value="#{bcms.roadForFire }">
                   <f:selectItems value="#{bcms.dao.getNameRoutes()}"/>
               </h:selectManyListbox>
           </div>
@@ -57,9 +57,8 @@
 
         <!-- Button (Double) -->
         <div class="form-group">
-          <label class="col-md-4 control-label" for="button1id"></label>
           <div class="col-md-8 pull-right">
-              <h:commandButton action="policeSession" class="btn btn-primary" style="margin-right:5px;" value="Run session"></h:commandButton>
+              <h:commandButton action="#{bcms.goToPoliceSession()}" class="btn btn-primary" style="margin-right:5px;" value="Run session"></h:commandButton>
               <h:commandButton action="#{bcms.deconnectPoliceman()}" class="btn btn-danger" value="Close session"></h:commandButton>
           </div>
         </div>
