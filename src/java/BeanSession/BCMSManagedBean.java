@@ -5,23 +5,13 @@
  */
 package BeanSession;
 
-import BeanEntity.Route;
 import com.pauware.pauware_engine._Exception.Statechart_exception;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
-import javax.ejb.Stateless;
-import javax.inject.Named;
-import javax.enterprise.context.Dependent;
-import javax.faces.application.ViewHandler;
 import javax.faces.bean.ManagedBean;
-import javax.faces.component.UIViewRoot;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpSession;
+
 
 /**
  *
@@ -39,38 +29,57 @@ public class BCMSManagedBean{
     private clientSessionLocal client;
     @EJB
     private BCMSDaoLocalReader dao;
-
+  
     static private int nbPoliceVehicule;
     static private int nbFireVehicule;
-    static private String[] roadForPolice ={};
-    static private String[] roadForFire ={};
-    static private boolean loaderRunning = true;
-    static private String stateSession = "Session not create";
-    
-    public FSC getFire(){ return fire;}
-    public PSC getPolice(){ return police;}
-    public String getStateSession(){return stateSession;}
+    static private String roadForPolice ="";
+    static private String roadForFire ="";
+    static private boolean fireAgreeWithFireRoads = false;
+    static private boolean fireAgreeWithPoliceRoads = false;
+    static private boolean fireDisagreeWithFireRoads = true;
+    static private boolean fireDisagreeWithPoliceRoads = true;
+    static private boolean fireSendRoads = false;
+
     public clientSessionLocal getClient(){ return client;}
     public BCMSDaoLocalReader getDao(){return dao;}
     public int getNbPoliceVehicule(){return nbPoliceVehicule;}
     public int getNbFireVehicule(){return nbFireVehicule;}
-    public String[] getRoadForPolice(){
-        return roadForPolice;
-    }
-    public String[] getRoadForFire(){
-        return roadForFire;
-    }
-    
-    public void setStateSession(String s){stateSession = s;}
+    public String getRoadForPolice(){ return roadForPolice;}
+    public String getRoadForFire(){ return roadForFire;}
+    public boolean getFireAgreeWithFireRoads(){return fireAgreeWithFireRoads;}
+    public boolean getFireAgreeWithPoliceRoads(){return fireAgreeWithPoliceRoads;}
+    public boolean getFireDisagreeWithFireRoads(){return fireDisagreeWithFireRoads;}
+    public boolean getFireDisagreeWithPoliceRoads(){return fireDisagreeWithPoliceRoads;}
+    public boolean getFireSendRoads(){return fireSendRoads;}
+
     public void setNbPoliceVehicule(int i){nbPoliceVehicule = i;}
     public void setNbFireVehicule(int i){nbFireVehicule = i;}
-    public void setRoadForPolice(String[] r){
-        roadForPolice = r;
-    }
-    public void setRoadForFire(String[] r){
-        roadForFire = r;
-    }
+    public void setRoadForPolice(String r){roadForPolice = r;}
+    public void setRoadForFire(String r){roadForFire = r;}
+    public void setFireSendRoads(boolean f){fireSendRoads = f;}
     
+    public String stateFireWithFireRoads(){
+        String result;
+        if(fireAgreeWithFireRoads && !fireDisagreeWithFireRoads)
+            result = "Fireman agree with police road(s)";
+        else if(fireAgreeWithFireRoads && fireDisagreeWithFireRoads)
+            result = "Fireman disagree with police road(s)";
+        else
+            result = "Waiting fireman";
+        return result;
+    }
+    public String stateFireWithPoliceRoads(){
+        String result;
+        if(fireAgreeWithPoliceRoads && !fireDisagreeWithPoliceRoads)
+            result = "Policeman agree with police road(s)";
+        else if(fireAgreeWithPoliceRoads && fireDisagreeWithPoliceRoads)
+            result = "Policeman disagree with police road(s)";
+        else
+            result = "Waiting Policeman";
+        return result;
+    }
+        
+ 
     public String connectFireman(){
         try {
             if(client.isFireSession() || !client.getFireSessionState()){
@@ -81,7 +90,6 @@ public class BCMSManagedBean{
                     if(!client.getFireSessionState())
                         client.setFireSessionHttp();
             }
-            setStateSession("Session created");
         } catch (Statechart_exception ex) {
                 Logger.getLogger(BCMSManagedBean.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -98,7 +106,6 @@ public class BCMSManagedBean{
                     if(!client.getPoliceSessionState())
                         client.setPoliceSessionHttp();
             }
-            setStateSession("Session created");
         } catch (Statechart_exception ex) {
                 Logger.getLogger(BCMSManagedBean.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -118,17 +125,16 @@ public class BCMSManagedBean{
         if(!client.getFireSessionState())
             ch = connectFireman();
         else if(client.getFireSessionState() && !client.isFireSession())
-            ch = "folowFireman";
+            ch = "folowFireman?faces-redirect=true";
            
         return ch;
         
     }
     public String actionPolicemanConnect(){
-        String ch ="";
-        if(!client.getPoliceSessionState())
+        String ch ="";                                                                                                                                                                                                                                                                                                                             if(!client.getPoliceSessionState())
             ch = connectPoliceman();
         else if(client.getPoliceSessionState() && !client.isPoliceSession())
-            ch = "folowFireman";
+            ch = "folowPoliceman?faces-redirect=true";
            
         return ch;
         
@@ -152,23 +158,63 @@ public class BCMSManagedBean{
         return ch;  
     }
     public String goToPoliceSession(){
-
-        return "policeSession";
+        return "policeSession?faces-redirect=true";
     }
-    public String waitRoute(){
-        System.out.println("------------------");
-        System.out.println("wait Road : "+ (roadForPolice.length == 0));
-        System.out.println("__________________");
-        return (roadForPolice.length == 0 || roadForFire.length == 0)? "" : "stopPlugin()";
+    public String goToFireSession(){
+        return "fireSession?faces-redirect=true";
     }
     
     public boolean roadNotReceived(){
-        return (roadForPolice.length == 0 || roadForFire.length == 0);
+        return (policeRoadNotReceived() || fireRoadNotReceived());
+    } 
+    public boolean isRoadAgree(){
+        return ((fireAgreeWithFireRoads && fireAgreeWithPoliceRoads) && (!fireDisagreeWithFireRoads && !fireDisagreeWithPoliceRoads));
+    } 
+    public boolean policeRoadNotReceived(){
+        return (roadForPolice.equals(""));
     }
-    public void setLoaderRunning(boolean b){
-        loaderRunning = b;
+    public boolean fireRoadNotReceived(){
+        return (roadForFire.equals(""));
     }
-    public boolean loaderIsRunning(){
-        return loaderRunning;
+    
+    public void onClickAgreeWithFireRoads(){
+        fireAgreeWithFireRoads = true;
+        fireDisagreeWithFireRoads = false;
+    }
+    public void onClickAgreeWithPoliceRoads(){
+        fireAgreeWithPoliceRoads = true;
+        fireDisagreeWithPoliceRoads = false;
+    }
+    public void onClickDisagreeWithFireRoads(){
+        fireAgreeWithFireRoads = true;
+        fireDisagreeWithFireRoads = true;
+    }
+    public void onClickDisagreeWithPoliceRoads(){
+        fireAgreeWithPoliceRoads = true;
+        fireDisagreeWithPoliceRoads = true;
+    }
+    public String styleBoutonDisagreeWithPoliceRoads(){
+        String result = "btn btn-default";
+        if(fireAgreeWithPoliceRoads && fireDisagreeWithPoliceRoads)
+            result = "btn btn-danger";
+        return result;
+    }
+    public String styleBoutonDisagreeWithFireRoads(){
+        String result = "btn btn-default";
+        if(fireAgreeWithFireRoads && fireDisagreeWithFireRoads)
+            result = "btn btn-danger";
+        return result;
+    }
+    public String styleBoutonAgreeWithPoliceRoads(){
+        String result = "btn btn-default";
+        if(fireAgreeWithPoliceRoads && !fireDisagreeWithPoliceRoads)
+            result = "btn btn-success";
+        return result;
+    }
+    public String styleBoutonAgreeWithFireRoads(){
+        String result = "btn btn-default";
+        if(fireAgreeWithFireRoads && !fireDisagreeWithFireRoads)
+            result = "btn btn-success";
+        return result;
     }
 }

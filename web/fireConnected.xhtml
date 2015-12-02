@@ -7,121 +7,88 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <ui:include src="header.xhtml"/>
-<h:body>
+    <h:body>
 
-<div id="frame">
-    <c:if test="#{!bcms.client.getFireSessionState() or (bcms.client.getFireSessionState() and !bcms.client.isFireSession())}">
-        <h:form> 
-            <p:poll id="poll" interval="1" update="btnFire"/>
-            <c:if test="#{bcms.client.getFireSessionState() and !bcms.client.isFireSession()}">
-            <p style="font-size: 18px">Fireman are ever connected</p><br/>
+        <div id="frame">
+            <c:if test="#{!bcms.client.getFireSessionState() or (bcms.client.getFireSessionState() and !bcms.client.isFireSession())}">
+                <h:form> 
+                    <p:poll id="poll" interval="1" update="btnFire"/>
+                    <c:if test="#{bcms.client.getFireSessionState() and !bcms.client.isFireSession()}">
+                        <p style="font-size: 18px">Fireman are ever connected</p><br/>
+                    </c:if>
+                    <h:commandLink id="btnFire" action="#{bcms.actionFiremanConnect()}" class="btn btn-lg btn-default"> <span class="glyphicon glyphicon-off"></span>  #{bcms.runOrFollowFireSession()}</h:commandLink>
+
+                </h:form>
             </c:if>
-            <h:commandLink id="btnFire" action="#{bcms.actionFiremanConnect()}" class="btn btn-lg btn-default"> <span class="glyphicon glyphicon-off"></span>  #{bcms.runOrFollowFireSession()}</h:commandLink>
+            <c:if test="#{bcms.client.isFireSession()}">
 
-        </h:form>
-    </c:if>
-    <c:if test="#{bcms.client.isFireSession()}">
 
-                                    
-        <h:form id="formulaire" class="form-horizontal">
-        <fieldset>
+                <h:form id="formulaire" class="form-horizontal">
+                    <fieldset>
 
-        <!-- Form Name -->
-        <legend>Crisis session</legend>
+                        <!-- Form Name -->
+                        <legend>Crisis session</legend>
 
-        <!-- Select Basic -->
-        <div class="form-group">
-          <h:outputLabel for="nbTruck" class="col-md-4 control-label" value="Number of truck"/>
-          <div class="col-md-4">
-              <h:selectOneMenu id="nbTruck" class="form-control" value="#{bcms.nbFireVehicule}">
-                  <c:forEach begin="1" end="#{bcms.dao.countFireTruck()}" var="i">
-                      <f:selectItem itemLabel="#{i}" itemValue="#{i}"/>
-                  </c:forEach>
-              </h:selectOneMenu>
-          </div>
+                        <!-- Select Basic -->
+                        <div class="form-group">
+                            <h:outputLabel for="nbTruck" class="col-md-4 control-label" value="Number of truck"/>
+                            <div class="col-md-4">
+                                <h:selectOneMenu id="nbTruck" class="form-control" value="#{bcms.nbFireVehicule}">
+                                    <c:forEach begin="1" end="#{bcms.dao.countFireTruck()}" var="i">
+                                        <f:selectItem itemLabel="#{i}" itemValue="#{i}"/>
+                                    </c:forEach>
+                                </h:selectOneMenu>
+                            </div>
+                        </div>
+                        <h:form id="Road">
+                            <p:poll interval="1" update="roadp"></p:poll>
+                            <p:poll interval="1" update="roadotp" stop="#{!bcms.policeRoadNotReceived}"></p:poll>
+                            <p:poll interval="1" update="boutonAgreeWithPoliceRoads" stop="#{!bcms.policeRoadNotReceived}"></p:poll>
+                            <h:outputText id="roadotp" value="#{bcms.roadNotReceived()?'Waiting for police roads':'Police roads'}"/>
+                            <h:selectOneListbox id="roadp"  class="form-control">
+                                <c:if test="#{!bcms.fireSendRoads}"><f:selectItem itemValue="---"/></c:if>
+                                <c:if test="#{bcms.fireSendRoads}"><f:selectItem itemValue="#{bcms.roadForPolice}"/></c:if>
+                            </h:selectOneListbox>
+                            <h:commandButton id="boutonAgreeWithPoliceRoads" disabled="#{bcms.policeRoadNotReceived()}" action="#{bcms.onClickAgreeWithPoliceRoads()}" class="#{bcms.styleBoutonAgreeWithPoliceRoads()}" style="margin-right:5px;" value="Agree for police roads"></h:commandButton>
+                            <h:commandButton id="boutonDisagreeWithPoliceRoads" action="#{bcms.onClickDisagreeWithPoliceRoads()}" class="#{bcms.styleBoutonDisagreeWithPoliceRoads()}" style="margin-right:5px;" value="Disgree for police roads"></h:commandButton>
+                            
+                            <br/>                        
+                            <p:poll interval="1" update="roadf" ></p:poll>
+                            <p:poll interval="1" update="roadotf" ></p:poll>
+                            <p:poll interval="1" update="boutonAgreeWithFireRoads" ></p:poll>                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+                            <h:outputText id="roadotf" value="#{bcms.roadNotReceived()?'Waiting for fire roads':'Fire roads'}"/>
+                            <h:selectOneListbox id="roadf"  class="form-control">
+                                <c:if test="#{!bcms.fireSendRoads}"><f:selectItem itemValue="---"/></c:if>
+                                <c:if test="#{bcms.fireSendRoads}"><f:selectItem itemValue="#{bcms.roadForFire}"/></c:if>
+                            </h:selectOneListbox>
+                            <h:commandButton id="boutonAgreeWithFireRoads" disabled="#{bcms.fireRoadNotReceived()}" action="#{bcms.onClickAgreeWithFireRoads()}" onclick="agreeFireRoad()" class="#{bcms.styleBoutonAgreeWithFireRoads()}" style="margin-right:5px;" value="Agree for fire roads"></h:commandButton>
+                            <h:commandButton id="boutonDisagreeWithFireRoads" action="#{bcms.onClickDisagreeWithFireRoads()}" class="#{bcms.styleBoutonDisagreeWithFireRoads()}" style="margin-right:5px;" value="Disgree for fire roads"></h:commandButton>
+                            
+                        </h:form>
+                        <!-- Button (Double) -->
+                        <div class="form-group ">
+                            <div class="col-md-8 pull-right">
+                                <h:commandButton id="boutonRunSessionFire" disabled="#{!bcms.isRoadAgree()}" action="#{bcms.goToFireSession()}" class="btn btn-primary" style="margin-right:5px;" value="Run session"></h:commandButton>
+                                <h:commandButton action="#{bcms.deconnectFireman()}" class="btn btn-danger" value="Close session"></h:commandButton>
+                            </div>
+                        </div>
+
+                    </fieldset>
+                </h:form>
+            </c:if>
         </div>
-        <h:form>
-            <p:poll id="pollroad" interval="1" update="road" ></p:poll>
-            <p:poll id="pollroadot" interval="1" update="roadot" ></p:poll>
-            <div id="loaderStyle">
-                <div id="dynElement" style="margin-top: 50px;">
-                </div>
-            </div>
-            <h:outputText id="roadot" value="#{bcms.roadNotReceived()?'Waiting for police roads':'Police roads'}"/>
-            <h:selectManyListbox id="road"  class="form-control">
-                <c:if test="#{bcms.loaderIsRunning() and (bcms.waitRoute() eq 'stopPlugin()')}">
-                    #{bcms.setLoaderRunning(false)}
-                <script>#{bcms.waitRoute()}</script>
-                </c:if>
-                <f:selectItems value="#{bcms.roadForPolice}"/>
-            </h:selectManyListbox>
-        </h:form>
-        <h:form>
-            <p:poll id="pollroad" interval="1" update="road" ></p:poll>
-            <p:poll id="pollroadot" interval="1" update="roadot" ></p:poll>
-            <div id="loaderStyle">
-                <div id="dynElement" style="margin-top: 50px;">
-                </div>
-            </div>
-            <h:outputText id="roadot" value="#{bcms.roadNotReceived()?'Waiting for fire roads':'Fire roads'}"/>
-            <h:selectManyListbox id="road"  class="form-control">
-                <c:if test="#{bcms.loaderIsRunning() and (bcms.waitRoute() eq 'stopPlugin()')}">
-                    #{bcms.setLoaderRunning(false)}
-                <script>#{bcms.waitRoute()}</script>
-                </c:if>
-                <f:selectItems value="#{bcms.roadForFire}"/>
-            </h:selectManyListbox>
-        </h:form>
-        <!-- Button (Double) -->
-        <div class="form-group ">
-          <div class="col-md-8 pull-right">
+        <script src="js/myAjax.js"></script>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+        <script type="text/javascript">
+                                                $(window).load(function () {
+                                                    $(".loader").fadeOut("1000");
+                                                });
+        </script>
 
-              
-              <h:commandButton action="#{bcms.goToFireSession()}" class="btn btn-primary" style="margin-right:5px;" value="Run session"></h:commandButton>
-              <h:commandButton action="#{bcms.deconnectFireman()}" class="btn btn-danger" value="Close session"></h:commandButton>
-          </div>
-        </div>
-
-        </fieldset>
-        </h:form>
-</c:if>
-</div>
-    <script src="js/myAjax.js"></script>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
-<script type="text/javascript">
-$(window).load(function() {
-	$(".loader").fadeOut("1000");
-})
-</script>
-            
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
         <script src="testLoader/dist/helpers/jquery.easing.1.3.js"></script>
         <script src="testLoader/dist/helpers/spin.min.js"></script>
         <script src="testLoader/dist/jquery.introLoader.js"></script>
-        
-<script>
-function startPlugin() {          
-    $("#dynElement").introLoader({
-        animation: {
-            name: 'simpleLoader',
-            options: {
-                stop: false,
-                fixed: false
-            }
-        }
-    });
-}
-function stopPlugin(){
-    var loader = $('#dynElement').data('introLoader');
-    loader.stop();    
-}
-            
-</script>
-        
-        <c:if test="#{bcms.roadNotReceived()}"><script> $(document).on('ready', startPlugin()); </script></c:if>
-        
-        <style>
-             #loaderStyle{width:100%; height:50px; position: absolute; margin-top: 40px;}
-        </style>
-</h:body>
+
+    </h:body>
 </html>
