@@ -6,112 +6,116 @@
       xmlns:c="http://java.sun.com/jsp/jstl/core"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
-    <ui:include src="header.xhtml"/>
+    <ui:include src="content/header.xhtml"/>
     <h:body>
-        <div id="frame">
+        <c:if test="#{!bcms.isOnPoliceSession}">
+            <div id="frame">
 
-            <c:if test="#{!bcms.client.getPoliceSessionState() or (bcms.client.getPoliceSessionState() and !bcms.client.isPoliceSession())}">
-                <h:form> 
-                    <p:poll id="poll" interval="1" update="btnFire"/>
-                    <c:if test="#{bcms.client.getPoliceSessionState() and !bcms.client.isPoliceSession()}">
-                        <p style="font-size: 18px">Policeman are ever connected</p><br/>
-                    </c:if>
-                    <h:commandLink id="btnFire" action="#{bcms.actionPolicemanConnect()}" class="btn btn-lg btn-default"> <span class="glyphicon glyphicon-off"></span>  #{bcms.runOrFollowPoliceSession()}</h:commandLink>
+                <c:if test="#{!bcms.client.getPoliceSessionState() or (bcms.client.getPoliceSessionState() and !bcms.client.isPoliceSession())}">
+                    <h:form> 
+                        <p:poll id="poll" interval="1" update="btnFire"/>
+                        <c:if test="#{bcms.client.getPoliceSessionState() and !bcms.client.isPoliceSession()}">
+                            <p style="font-size: 18px">Policeman are ever connected</p><br/>
+                        </c:if>
+                        <h:commandLink id="btnFire" action="#{bcms.actionPolicemanConnect()}" class="btn btn-lg btn-default"> <span class="glyphicon glyphicon-off"></span>  #{bcms.runOrFollowPoliceSession()}</h:commandLink>
 
-                </h:form>
-            </c:if>
-            <c:if test="#{bcms.client.isPoliceSession()}">
-                <h:form id="formulaire" class="form-horizontal">
-                    <fieldset>
+                    </h:form>
+                </c:if>
+                <c:if test="#{bcms.client.isPoliceSession()}">
+                    <h:form id="formulaire" class="form-horizontal">
+                        <fieldset>
 
-                        <!-- Form Name -->
-                        <legend>Crisis session</legend>
+                            <!-- Form Name -->
+                            <legend>Crisis session</legend>
 
-                        <!-- Select Basic -->
-                        <div class="form-group">
-                            <h:outputLabel for="nbVehicule" class="col-md-4 control-label" value="Number of vehicule"/>
-                            <div class="col-md-4">
-                                <h:selectOneMenu id="nbVehicule" class="form-control" value="#{bcms.nbPoliceVehicule}">
-                                    <c:forEach begin="1" end="#{bcms.dao.countPoliceVehicle()}" var="i">
-                                        <f:selectItem itemLabel="#{i}" itemValue="#{i}"/>
-                                    </c:forEach>
-                                </h:selectOneMenu>
+                            <!-- Select Basic -->
+                            <div class="form-group">
+                                <h:outputLabel for="nbVehicule" class="col-md-4 control-label" value="Number of vehicule"/>
+                                <div class="col-md-4">
+                                    <h:selectOneMenu id="nbVehicule" class="form-control" value="#{bcms.nbPoliceVehicule}">
+                                        <c:forEach begin="1" end="#{bcms.dao.countPoliceVehicle()}" var="i">
+                                            <f:selectItem itemLabel="#{i}" itemValue="#{i}"/>
+                                        </c:forEach>
+                                    </h:selectOneMenu>
+                                </div>
                             </div>
-                        </div>
-                        <!-- Select Multiple -->
-                        <div class="form-group">
-                            <h:outputLabel for="routesPolice" class="col-md-4 control-label" value="Select road(s) for Police"/>
-                            <div class="col-md-4">
-                                <h:selectOneListbox id="routesPolice"  class="form-control" value="#{bcms.roadForPolice}" onclick="aRoadIsSelect('police')">
-                                    <f:selectItems value="#{bcms.dao.getNameRoutes()}"/>
-                                </h:selectOneListbox>
+                            <!-- Select Multiple -->
+                            <div class="form-group">
+                                <h:outputLabel for="routesPolice" class="col-md-4 control-label" value="Select road(s) for Police"/>
+                                <div class="col-md-4">
+                                    <h:selectOneListbox id="routesPolice"  class="form-control" value="#{bcms.roadForPolice}" onclick="aRoadIsSelect('police')">
+                                        <f:selectItems value="#{bcms.dao.getNameRoutes()}"/>
+                                    </h:selectOneListbox>
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <h:outputLabel for="routesFire" class="col-md-4 control-label" value="Select road(s) for Fire"/>
-                            <div class="col-md-4">
-                                <h:selectOneListbox id="routesFire"  class="form-control"  value="#{bcms.roadForFire }" onclick="aRoadIsSelect('fire')">
-                                    <f:selectItems value="#{bcms.dao.getNameRoutes()}"/>
-                                </h:selectOneListbox>
+                            <div class="form-group">
+                                <h:outputLabel for="routesFire" class="col-md-4 control-label" value="Select road(s) for Fire"/>
+                                <div class="col-md-4">
+                                    <h:selectOneListbox id="routesFire"  class="form-control"  value="#{bcms.roadForFire }" onclick="aRoadIsSelect('fire')">
+                                        <f:selectItems value="#{bcms.dao.getNameRoutes()}"/>
+                                    </h:selectOneListbox>
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-md-4">
-                                <h:commandButton id="boutonRoads" class="btn btn-default" action="#{bcms.setFireSendRoads(true)}" style="margin-right:5px;" value="Send roads for Police"></h:commandButton>
-                                <div class="pull-right">
+                            <div class="form-group">
+                                <div class="col-md-4">
+                                    <h:commandButton id="boutonRoads" class="btn btn-default" action="#{bcms.onClickFireSendRoads()}" style="margin-right:5px;" value="Send roads for Police"></h:commandButton>
+                                    <div class="pull-right">
                                         <p:poll interval="1" update="checkPoliceRoadAgree">
                                             <h:outputLabel id="checkPoliceRoadAgree" style="#{(bcms.getFireAgreeWithPoliceRoads() and !bcms.fireDisagreeWithPoliceRoads)?'color:green':'color: red'}"  value="#{bcms.stateFireWithPoliceRoads()}"/>
                                         </p:poll>
-                                    <br/>
-                                    
-                           
+                                        <br/>
+
+
                                         <p:poll interval="1" update="checkFireRoadAgree">
                                             <h:outputLabel id="checkFireRoadAgree" style="#{(bcms.getFireAgreeWithFireRoads() and !bcms.fireDisagreeWithFireRoads)?'color:green':'color: red'}" value="#{bcms.stateFireWithFireRoads()} "/>
                                         </p:poll>
-                       
+
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <!-- Button (Double) -->
-                        <div class="form-group">
-                            <div class="col-md-8 pull-right">
-                                <h:form>
-                                    <p:poll interval="1" update="runSession"/>
-                                    <h:commandButton id="runSession" action="#{bcms.goToPoliceSession()}" class="btn btn-primary" style="margin-right:5px;" value="Run session" disabled="#{!bcms.isRoadAgree()}"></h:commandButton>
-                                
-                                <h:commandButton action="#{bcms.deconnectPoliceman()}" class="btn btn-danger" value="Close session"></h:commandButton>
-                                </h:form>
-                            </div>
-                        </div>
+                            <!-- Button (Double) -->
+                            <div class="form-group">
+                                <div class="col-md-8 pull-right">
+                                    <h:form>
+                                        <p:poll interval="1" update="runSession"/>
+                                        <h:commandButton id="runSession" action="#{bcms.goToPoliceSession()}" class="btn btn-primary" style="margin-right:5px;" value="Run session" disabled="#{!bcms.isRoadAgree()}"></h:commandButton>
 
-                    </fieldset>
-                </h:form>
+                                        <h:commandButton action="#{bcms.deconnectPoliceman()}" class="btn btn-danger" value="Close session"></h:commandButton>
+                                    </h:form>
+                                </div>
+                            </div>
+
+                        </fieldset>
+                    </h:form>
+                </c:if>
+            </div>
+            <c:if test="#{bcms.roadNotReceived()}">
+                <script>
+                    var fire = false;
+                    var police = false;
+                    document.getElementById('formulaire:boutonRoads').disabled = true;
+                    function aRoadIsSelect(name) {
+                        if (name === "fire")
+                            fire = true;
+                        if (name === "police")
+                            police = true;
+                        if (fire === police === true)
+                            document.getElementById('formulaire:boutonRoads').disabled = false;
+                    }
+                </script>
             </c:if>
-        </div>
-        <c:if test="#{bcms.roadNotReceived()}">
-            <script>
-                var fire = false;
-                var police = false;
-                document.getElementById('formulaire:boutonRoads').disabled = true;
-                function aRoadIsSelect(name) {
-                    if (name === "fire")
-                        fire = true;
-                    if (name === "police")
-                        police = true;
-                    if (fire === police === true)
-                        document.getElementById('formulaire:boutonRoads').disabled = false;
-                }
-            </script>
         </c:if>
-        <script src="js/myAjax.js"></script>
+        <c:if test="#{bcms.isOnPoliceSession}">
+            <include src="policeSession.xhtml"/>
+        </c:if>
         <script>
-                function disabledRoadPolice(){
-                    alert();
-                    document.getElementById('formulaire:routesPolice').disabled = 'disabled';
-                }
-                function disabledRoadFire(){
-                    document.getElementById('formulaire:routesFire').disabled = 'disabled';
-                }
+                    function disabledRoadPolice() {
+                        alert();
+                        document.getElementById('formulaire:routesPolice').disabled = 'disabled';
+                    }
+                    function disabledRoadFire() {
+                        document.getElementById('formulaire:routesFire').disabled = 'disabled';
+                    }
         </script>
     </h:body>
 </html>

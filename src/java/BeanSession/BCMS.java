@@ -5,8 +5,9 @@
  */
 package BeanSession;
 
+import DAO.BCMSDaoLocalReader;
+import DAO.BCMSDaoLocalWriter;
 import javax.ejb.Singleton;
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import BeanEntity.*;
 
@@ -17,15 +18,10 @@ import BeanEntity.*;
 import com.pauware.pauware_engine._Core.*;
 import com.pauware.pauware_engine._Exception.*;
 import com.pauware.pauware_engine._Java_EE.*;
-import static com.sun.faces.facelets.util.Path.context;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Startup;
-import javax.faces.bean.ManagedBean;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpSession;
-
 
 final class Timeout_log {
 
@@ -42,7 +38,6 @@ final class Timeout_log {
 }
 
 @Singleton
-//@Startup
 public class BCMS extends Timer_monitor implements FSC, PSC {
 
     @EJB
@@ -154,7 +149,6 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
     protected AbstractStatechart _Completion_of_objectives;
     protected AbstractStatechart _End_of_crisis;
     protected AbstractStatechart_monitor _bCMS_state_machine;
-    
 
     private void init_structure() throws Statechart_exception {
         _timeout_log = new java.util.LinkedList();
@@ -390,21 +384,6 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
 
             _bCMS_state_machine.start();
             service.createSession();
-            /*Long lcountFT =  service.countFireTruck();
-            Long lcountPV =  service.countPoliceVehicle();
-            int countFT = (lcountFT).intValue();
-            int countPV = (lcountPV).intValue();
-
-            FSC_connection_request();
-            PSC_connection_request();
-            
-            state_fire_truck_number(countFT);
-            state_police_vehicle_number(countPV);*/
-            
-            //route_for_fire_trucks("Route1");
-            System.out.println("APRESS ENCORE");
-            //route_for_police_vehicles("Road2");
-            
         } catch (Statechart_exception e) {
             System.err.println(e.getMessage());
         }
@@ -412,6 +391,7 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
 
     @PreDestroy
     public void stop() {
+        service.stopSession();
         service = null;
         try {
             _bCMS_state_machine.stop();
@@ -446,24 +426,34 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
     @Override
     public void FSC_connection_request() throws Statechart_exception {
         _bCMS_state_machine.run_to_completion(_FSC_connection_request);
-        service.createEvent(_FSC_connection_request,_bCMS_state_machine.current_state(),"FSC");
-        
+        service.createEvent(_FSC_connection_request, _bCMS_state_machine.current_state(), "FSC");
+
         List<FireTruck> listeFireTruck = serviceR.getFireTruck();
-        for(int i=0; i<listeFireTruck.size(); i++){
+        for (int i = 0; i < listeFireTruck.size(); i++) {
             System.out.println(listeFireTruck.get(i));
             _bCMS_state_machine.run_to_completion(_Fire_truck_dispatched);
-            
-            service.createSessionFireTruck(listeFireTruck.get(i),i);
-            
-            service.createEvent(_Fire_truck_dispatched, _bCMS_state_machine.current_state(),"FSC");
-     
+
+            service.createSessionFireTruck(listeFireTruck.get(i), i);
+
+            service.createEvents(Integer.toString(i),_Fire_truck_dispatched, _bCMS_state_machine.current_state(), "FSC");
+
         }
     }
 
     @Override
     public void PSC_connection_request() throws Statechart_exception {
         _bCMS_state_machine.run_to_completion(_PSC_connection_request);
-        service.createEvent(_PSC_connection_request, _bCMS_state_machine.current_state(),"PSC");
+        service.createEvent(_PSC_connection_request, _bCMS_state_machine.current_state(), "PSC");
+        List<PoliceVehicle> listePoliceVehicle = serviceR.getPoliceVehicle();
+        for (int i = 0; i < listePoliceVehicle.size(); i++) {
+            System.out.println(listePoliceVehicle.get(i));
+            _bCMS_state_machine.run_to_completion(_Fire_truck_dispatched);
+
+            service.createSessionPoliceVehicle(listePoliceVehicle.get(i), i);
+
+            service.createEvents(Integer.toString(i),_Police_vehicle_dispatched, _bCMS_state_machine.current_state(), "PSC");
+
+        }
     }
 
     @Override
@@ -471,7 +461,8 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
         _bCMS_state_machine.fires(_State_fire_truck_number, _Crisis_details_exchange, _Number_of_fire_truck_defined, true, this, "set_number_of_fire_truck_required", new Object[]{number_of_fire_truck_required});
         _bCMS_state_machine.fires(_State_fire_truck_number, _Number_of_police_vehicle_defined, _Route_plan_development, true, this, "set_number_of_fire_truck_required", new Object[]{number_of_fire_truck_required});
         _bCMS_state_machine.run_to_completion(_State_fire_truck_number);
-        serviceR.setNbFireTruck(number_of_fire_truck_required);
+        service.createEvent(_State_fire_truck_number, _bCMS_state_machine.current_state(), "FSC");
+        service.setNbFireTruck(number_of_fire_truck_required);
     }
 
     @Override
@@ -479,24 +470,22 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
         _bCMS_state_machine.fires(_State_police_vehicle_number, _Crisis_details_exchange, _Number_of_police_vehicle_defined, true, this, "set_number_of_police_vehicle_required", new Object[]{number_of_police_vehicle_required});
         _bCMS_state_machine.fires(_State_police_vehicle_number, _Number_of_fire_truck_defined, _Route_plan_development, true, this, "set_number_of_police_vehicle_required", new Object[]{number_of_police_vehicle_required});
         _bCMS_state_machine.run_to_completion(_State_police_vehicle_number);
-        serviceR.setNbPoliceVehicule(number_of_police_vehicle_required);
-        
+        service.createEvent(_State_police_vehicle_number, _bCMS_state_machine.current_state(), "PSC");
+        service.setNbPoliceVehicule(number_of_police_vehicle_required);
+
     }
 
     @Override
     public void route_for_fire_trucks(String route_name) throws Statechart_exception {
         _last_fire_truck_route = null;
         _last_fire_truck_route = serviceR.getRoute(route_name);// On construit un entity bean 'Route' avec sa clef 'route_name' ; on le cherche dans la base...
-        System.out.println("                        ");
-        System.out.println(_last_fire_truck_route);
         if (_last_fire_truck_route != null) {
             _bCMS_state_machine.run_to_completion(_Route_for_fire_trucks);
-            service.createEvent(_Route_for_fire_trucks, _bCMS_state_machine.current_state(),"FSC");
+            service.createEvent(_Route_for_fire_trucks, _bCMS_state_machine.current_state(), "FSC");
         } else {
             throw new Statechart_exception("Fire truck route " + route_name + " does not exist...");
         }
     }
-    
 
     @Override
     public void route_for_police_vehicles(String route_name) throws Statechart_exception {
@@ -504,7 +493,7 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
         _last_police_vehicle_route = serviceR.getRoute(route_name); // On construit un entity bean 'Route' avec sa clef 'route_name' ; on le cherche dans la base...
         if (_last_police_vehicle_route != null) {
             _bCMS_state_machine.run_to_completion(_Route_for_police_vehicles);
-            service.createEvent(_Route_for_police_vehicles, _bCMS_state_machine.current_state(),"PSC");
+            service.createEvent(_Route_for_police_vehicles, _bCMS_state_machine.current_state(), "PSC");
         } else {
             throw new Statechart_exception("Police vehicle route " + route_name + " does not exist...");
         }
@@ -514,44 +503,57 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
     @Override
     public void FSC_agrees_about_fire_truck_route() throws Statechart_exception {
         _bCMS_state_machine.run_to_completion(_FSC_agrees_about_fire_truck_route);
+        service.createEvent(_FSC_agrees_about_fire_truck_route, _bCMS_state_machine.current_state(), "FSC");
+
     }
 
     @Override
     public void FSC_agrees_about_police_vehicle_route() throws Statechart_exception {
         _bCMS_state_machine.run_to_completion(_FSC_agrees_about_police_vehicle_route);
+         service.createEvent(_FSC_agrees_about_police_vehicle_route, _bCMS_state_machine.current_state(), "FSC");
+
     }
 
     @Override
     public void FSC_disagrees_about_fire_truck_route() throws Statechart_exception {
         _bCMS_state_machine.run_to_completion(_FSC_disagrees_about_fire_truck_route);
+        service.createEvent(_FSC_disagrees_about_fire_truck_route, _bCMS_state_machine.current_state(), "FSC");
+
     }
 
     @Override
     public void FSC_disagrees_about_police_vehicle_route() throws Statechart_exception {
         _bCMS_state_machine.run_to_completion(_FSC_disagrees_about_police_vehicle_route);
+        service.createEvent(_FSC_disagrees_about_police_vehicle_route, _bCMS_state_machine.current_state(), "FSC");
+
     }
 
     @Override
     public void enough_fire_trucks_dispatched() throws Statechart_exception {
         _bCMS_state_machine.run_to_completion(_Enough_fire_trucks_dispatched, AbstractStatechart_monitor.Compute_invariants);
+        service.createEvent(_Enough_fire_trucks_dispatched, _bCMS_state_machine.current_state(), "FSC");
+
     }
 
     @Override
     public void fire_truck_dispatched(String fire_truck) throws Statechart_exception {
-        _bCMS_state_machine.fires(_Fire_truck_dispatched, _Step_4_Dispatching, _Step_4_Dispatching, this, "fire_truck_dispatched_less_than_number_of_fire_truck_required", null, this, "fire_trucks_dispatched_add", new Object[]{fire_truck});
-        _bCMS_state_machine.fires(_Fire_truck_dispatched, _Step_4_Dispatching, _Step_4_Dispatching, this, "fire_truck_dispatched_less_than_number_of_fire_truck_required", null, this, "enough_fire_trucks_dispatched", null, AbstractStatechart.Reentrance);
-        _bCMS_state_machine.fires(_Fire_truck_dispatched, _All_police_vehicles_dispatched, _All_police_vehicles_dispatched, this, "fire_truck_dispatched_less_than_number_of_fire_truck_required", null, this, "fire_trucks_dispatched_add", new Object[]{fire_truck});
-        _bCMS_state_machine.fires(_Fire_truck_dispatched, _All_police_vehicles_dispatched, _All_police_vehicles_dispatched, this, "fire_truck_dispatched_less_than_number_of_fire_truck_required", null, this, "enough_fire_trucks_dispatched", null, AbstractStatechart.Reentrance);
-        _bCMS_state_machine.run_to_completion(_Fire_truck_dispatched);
-        
         FireTruck ft = new FireTruck();
         ft = serviceR.getFireTruck(fire_truck);
-        
-        if(ft != null){
-            service.createEvent(_Fire_truck_dispatched, _bCMS_state_machine.current_state(),"FSC");
-            service.createSessionFireTruck(ft, 0);
-            
-        }   
+
+        if (ft != null) {
+            _bCMS_state_machine.fires(_Fire_truck_dispatched, _Step_4_Dispatching, _Step_4_Dispatching, this, "fire_truck_dispatched_less_than_number_of_fire_truck_required", null, this, "fire_trucks_dispatched_add", new Object[]{fire_truck});
+            _bCMS_state_machine.fires(_Fire_truck_dispatched, _Step_4_Dispatching, _Step_4_Dispatching, this, "fire_truck_dispatched_less_than_number_of_fire_truck_required", null, this, "enough_fire_trucks_dispatched", null, AbstractStatechart.Reentrance);
+            _bCMS_state_machine.fires(_Fire_truck_dispatched, _All_police_vehicles_dispatched, _All_police_vehicles_dispatched, this, "fire_truck_dispatched_less_than_number_of_fire_truck_required", null, this, "fire_trucks_dispatched_add", new Object[]{fire_truck});
+            _bCMS_state_machine.fires(_Fire_truck_dispatched, _All_police_vehicles_dispatched, _All_police_vehicles_dispatched, this, "fire_truck_dispatched_less_than_number_of_fire_truck_required", null, this, "enough_fire_trucks_dispatched", null, AbstractStatechart.Reentrance);
+            _bCMS_state_machine.run_to_completion(_Fire_truck_dispatched);
+
+            service.createEvent(_Fire_truck_dispatched, _bCMS_state_machine.current_state(), "FSC");
+
+            BcmsSessionFireTruck bcmsft = new BcmsSessionFireTruck();
+            bcmsft = serviceR.getBcmsSessionFireTruckByFireTruckName(ft.getFireTruckName());
+
+            service.setFireTruckStatus(bcmsft, "Dispatched");
+        }
     }
 
     @Override
@@ -568,39 +570,82 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
     @Override
     public void enough_police_vehicles_dispatched() throws Statechart_exception {
         _bCMS_state_machine.run_to_completion(_Enough_police_vehicles_dispatched, AbstractStatechart_monitor.Compute_invariants);
+        service.createEvent(_Enough_police_vehicles_dispatched, _bCMS_state_machine.current_state(), "PSC");
+
     }
 
     @Override
     public void police_vehicle_dispatched(String police_vehicle) throws Statechart_exception {
-        _bCMS_state_machine.fires(_Police_vehicle_dispatched, _Step_4_Dispatching, _Step_4_Dispatching, this, "police_vehicle_dispatched_less_than_number_of_police_vehicle_required", null, this, "police_vehicles_dispatched_add", new Object[]{police_vehicle});
-        _bCMS_state_machine.fires(_Police_vehicle_dispatched, _Step_4_Dispatching, _Step_4_Dispatching, this, "police_vehicle_dispatched_less_than_number_of_police_vehicle_required", null, this, "enough_police_vehicles_dispatched", null, AbstractStatechart.Reentrance);
-        _bCMS_state_machine.fires(_Police_vehicle_dispatched, _All_fire_trucks_dispatched, _All_fire_trucks_dispatched, this, "police_vehicle_dispatched_less_than_number_of_police_vehicle_required", null, this, "police_vehicles_dispatched_add", new Object[]{police_vehicle});
-        _bCMS_state_machine.fires(_Police_vehicle_dispatched, _All_fire_trucks_dispatched, _All_fire_trucks_dispatched, this, "police_vehicle_dispatched_less_than_number_of_police_vehicle_required", null, this, "enough_police_vehicles_dispatched", null, AbstractStatechart.Reentrance);
-        _bCMS_state_machine.run_to_completion(_Police_vehicle_dispatched);
+        PoliceVehicle pv = new PoliceVehicle();
+        pv = serviceR.getPoliceVehicule(police_vehicle);
+
+        if (pv != null) {
+            _bCMS_state_machine.fires(_Police_vehicle_dispatched, _Step_4_Dispatching, _Step_4_Dispatching, this, "police_vehicle_dispatched_less_than_number_of_police_vehicle_required", null, this, "police_vehicles_dispatched_add", new Object[]{police_vehicle});
+            _bCMS_state_machine.fires(_Police_vehicle_dispatched, _Step_4_Dispatching, _Step_4_Dispatching, this, "police_vehicle_dispatched_less_than_number_of_police_vehicle_required", null, this, "enough_police_vehicles_dispatched", null, AbstractStatechart.Reentrance);
+            _bCMS_state_machine.fires(_Police_vehicle_dispatched, _All_fire_trucks_dispatched, _All_fire_trucks_dispatched, this, "police_vehicle_dispatched_less_than_number_of_police_vehicle_required", null, this, "police_vehicles_dispatched_add", new Object[]{police_vehicle});
+            _bCMS_state_machine.fires(_Police_vehicle_dispatched, _All_fire_trucks_dispatched, _All_fire_trucks_dispatched, this, "police_vehicle_dispatched_less_than_number_of_police_vehicle_required", null, this, "enough_police_vehicles_dispatched", null, AbstractStatechart.Reentrance);
+            _bCMS_state_machine.run_to_completion(_Police_vehicle_dispatched);
+
+            service.createEvent(_Police_vehicle_dispatched, _bCMS_state_machine.current_state(), "PSC");
+
+            BcmsSessionPoliceVehicle bcmspv = new BcmsSessionPoliceVehicle();
+            bcmspv = serviceR.getBcmsSessionPoliceVehicleByPoliceVehicleName(pv.getPoliceVehicleName());
+
+            service.setPoliceVehicleStatus(bcmspv, "Dispatched");
+        }
     }
 
     @Override
     public void enough_fire_trucks_arrived() throws Statechart_exception {
         _bCMS_state_machine.run_to_completion(_Enough_fire_trucks_arrived, AbstractStatechart_monitor.Compute_invariants);
+        service.createEvent(_Enough_fire_trucks_arrived, _bCMS_state_machine.current_state(), "FSC");
+
     }
 
     @Override
     public void fire_truck_arrived(String fire_truck) throws Statechart_exception {
-        _bCMS_state_machine.fires(_Fire_truck_arrived, _Fire_trucks_arriving, _Fire_trucks_arriving, this, "fire_truck_arrived_less_than_fire_truck_dispatched", null, this, "fire_trucks_arrived_add", new Object[]{fire_truck});
-        _bCMS_state_machine.fires(_Fire_truck_arrived, _Fire_trucks_arriving, _Fire_trucks_arriving, this, "fire_truck_arrived_less_than_fire_truck_dispatched", null, this, "enough_fire_trucks_arrived", null, AbstractStatechart.Reentrance);
-        _bCMS_state_machine.run_to_completion(_Fire_truck_arrived);
+        FireTruck ft = new FireTruck();
+        ft = serviceR.getFireTruck(fire_truck);
+
+        if (ft != null) {
+            _bCMS_state_machine.fires(_Fire_truck_arrived, _Fire_trucks_arriving, _Fire_trucks_arriving, this, "fire_truck_arrived_less_than_fire_truck_dispatched", null, this, "fire_trucks_arrived_add", new Object[]{fire_truck});
+            _bCMS_state_machine.fires(_Fire_truck_arrived, _Fire_trucks_arriving, _Fire_trucks_arriving, this, "fire_truck_arrived_less_than_fire_truck_dispatched", null, this, "enough_fire_trucks_arrived", null, AbstractStatechart.Reentrance);
+            _bCMS_state_machine.run_to_completion(_Fire_truck_arrived);
+
+            service.createEvent(_Fire_truck_arrived, _bCMS_state_machine.current_state(), "FSC");
+
+            BcmsSessionFireTruck bcmsft = new BcmsSessionFireTruck();
+            bcmsft = serviceR.getBcmsSessionFireTruckByFireTruckName(ft.getFireTruckName());
+
+            service.setFireTruckStatus(bcmsft, "Arrived");
+        }
+
     }
 
     @Override
     public void enough_police_vehicles_arrived() throws Statechart_exception {
         _bCMS_state_machine.run_to_completion(_Enough_police_vehicles_arrived, AbstractStatechart_monitor.Compute_invariants);
+        service.createEvent(_Enough_fire_trucks_arrived, _bCMS_state_machine.current_state(), "PSC");
+
     }
 
     @Override
     public void police_vehicle_arrived(String police_vehicle) throws Statechart_exception {
-        _bCMS_state_machine.fires(_Police_vehicle_arrived, _Police_vehicles_arriving, _Police_vehicles_arriving, this, "police_vehicle_arrived_less_than_police_vehicle_dispatched", null, this, "police_vehicles_arrived_add", new Object[]{police_vehicle});
-        _bCMS_state_machine.fires(_Police_vehicle_arrived, _Police_vehicles_arriving, _Police_vehicles_arriving, this, "police_vehicle_arrived_less_than_police_vehicle_dispatched", null, this, "enough_police_vehicles_arrived", null, AbstractStatechart.Reentrance);
-        _bCMS_state_machine.run_to_completion(_Police_vehicle_arrived);
+        PoliceVehicle pv = new PoliceVehicle();
+        pv = serviceR.getPoliceVehicule(police_vehicle);
+
+        if (pv != null) {
+            _bCMS_state_machine.fires(_Police_vehicle_arrived, _Police_vehicles_arriving, _Police_vehicles_arriving, this, "police_vehicle_arrived_less_than_police_vehicle_dispatched", null, this, "police_vehicles_arrived_add", new Object[]{police_vehicle});
+            _bCMS_state_machine.fires(_Police_vehicle_arrived, _Police_vehicles_arriving, _Police_vehicles_arriving, this, "police_vehicle_arrived_less_than_police_vehicle_dispatched", null, this, "enough_police_vehicles_arrived", null, AbstractStatechart.Reentrance);
+            _bCMS_state_machine.run_to_completion(_Police_vehicle_arrived);
+
+            service.createEvent(_Police_vehicle_dispatched, _bCMS_state_machine.current_state(), "PSC");
+
+            BcmsSessionPoliceVehicle bcmspv = new BcmsSessionPoliceVehicle();
+            bcmspv = serviceR.getBcmsSessionPoliceVehicleByPoliceVehicleName(pv.getPoliceVehicleName());
+
+            service.setPoliceVehicleStatus(bcmspv, "Arrived");
+        }
     }
 
     @Override
@@ -611,6 +656,19 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
         } else {
             args = new Object[]{fire_truck};
         }
+
+        FireTruck ft = new FireTruck();
+        ft = serviceR.getFireTruck(fire_truck);
+
+        if (ft != null) {
+            service.createEvent(_Fire_truck_breakdown, _bCMS_state_machine.current_state(), "FSC");
+
+            BcmsSessionFireTruck bcmsft = new BcmsSessionFireTruck();
+            bcmsft = serviceR.getBcmsSessionFireTruckByFireTruckName(ft.getFireTruckName());
+
+            service.setFireTruckStatus(bcmsft, "Breakdown");
+        }
+        fire_truck_dispatched(replacement_fire_truck);
         _Step_5_Arrival.allowedEvent(_Fire_truck_breakdown, this, "fire_trucks_dispatched_remove", args);
         _bCMS_state_machine.run_to_completion(_Fire_truck_breakdown);
     }
@@ -623,37 +681,101 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
         } else {
             args = new Object[]{police_vehicle};
         }
+
+        PoliceVehicle pv = new PoliceVehicle();
+        pv = serviceR.getPoliceVehicule(police_vehicle);
+
+        if (pv != null) {
+            service.createEvent(_Police_vehicle_breakdown, _bCMS_state_machine.current_state(), "PSC");
+
+            BcmsSessionPoliceVehicle bcmspv = new BcmsSessionPoliceVehicle();
+            bcmspv = serviceR.getBcmsSessionPoliceVehicleByPoliceVehicleName(pv.getPoliceVehicleName());
+
+            service.setPoliceVehicleStatus(bcmspv, "Breakdown");
+        }
+        police_vehicle_dispatched(replacement_police_vehicle);
         _Step_5_Arrival.allowedEvent(_Police_vehicle_breakdown, this, "police_vehicles_dispatched_remove", args);
         _bCMS_state_machine.run_to_completion(_Police_vehicle_breakdown);
     }
 
     @Override
     public void fire_truck_blocked(String fire_truck) throws Statechart_exception {
-        _bCMS_state_machine.fires(_Fire_truck_blocked, _Step_5_Arrival, _Crisis_details_exchange, true, this, "fire_trucks_dispatched_remove", new Object[]{fire_truck});
-        _bCMS_state_machine.run_to_completion(_Fire_truck_blocked);
+        FireTruck ft = new FireTruck();
+        ft = serviceR.getFireTruck(fire_truck);
+
+        if (ft != null) {
+            _bCMS_state_machine.fires(_Fire_truck_blocked, _Step_5_Arrival, _Crisis_details_exchange, true, this, "fire_trucks_dispatched_remove", new Object[]{fire_truck});
+            _bCMS_state_machine.run_to_completion(_Fire_truck_blocked);
+
+            service.createEvent(_Fire_truck_blocked, _bCMS_state_machine.current_state(), "FSC");
+
+            BcmsSessionFireTruck bcmsft = new BcmsSessionFireTruck();
+            bcmsft = serviceR.getBcmsSessionFireTruckByFireTruckName(ft.getFireTruckName());
+
+            service.setFireTruckStatus(bcmsft, "Blocked");
+        }
+
     }
 
     @Override
     public void police_vehicle_blocked(String police_vehicle) throws Statechart_exception {
-        _bCMS_state_machine.fires(_Police_vehicle_blocked, _Step_5_Arrival, _Crisis_details_exchange, true, this, "police_vehicles_dispatched_remove", new Object[]{police_vehicle});
-        _bCMS_state_machine.run_to_completion(_Police_vehicle_blocked);
+        PoliceVehicle pv = new PoliceVehicle();
+        pv = serviceR.getPoliceVehicule(police_vehicle);
+
+        if (pv != null) {
+            _bCMS_state_machine.fires(_Police_vehicle_blocked, _Step_5_Arrival, _Crisis_details_exchange, true, this, "police_vehicles_dispatched_remove", new Object[]{police_vehicle});
+            _bCMS_state_machine.run_to_completion(_Police_vehicle_blocked);
+
+            service.createEvent(_Police_vehicle_blocked, _bCMS_state_machine.current_state(), "PSC");
+
+            BcmsSessionPoliceVehicle bcmspv = new BcmsSessionPoliceVehicle();
+            bcmspv = serviceR.getBcmsSessionPoliceVehicleByPoliceVehicleName(pv.getPoliceVehicleName());
+
+            service.setPoliceVehicleStatus(bcmspv, "Blocked");
+        }
+
     }
 
     @Override
     public void crisis_is_more_severe() throws Statechart_exception {
         _bCMS_state_machine.run_to_completion(_Crisis_is_more_severe);
+      service.createEvent(_Crisis_is_more_severe, _bCMS_state_machine.current_state(), "PSC/FSC");
+
     }
 
     @Override
     public void crisis_is_less_severe() throws Statechart_exception {
         _bCMS_state_machine.run_to_completion(_Crisis_is_less_severe);
+        service.createEvent(_Crisis_is_less_severe, _bCMS_state_machine.current_state(), "PSC/FSC");
+
     }
 
     @Override
     public void no_more_route_left() throws Statechart_exception {
         _bCMS_state_machine.run_to_completion(_No_more_route_left);
+        service.createEvent(_No_more_route_left, _bCMS_state_machine.current_state(), "PSC");
+
     }
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     /**
      * SCXML conditions
      */

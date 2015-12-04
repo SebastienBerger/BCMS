@@ -6,9 +6,9 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:p="http://primefaces.org/ui"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
-    <ui:include src="header.xhtml"/>
+    <ui:include src="content/header.xhtml"/>
     <h:body>
-
+        <c:if test="#{!bcms.isOnFireSession}">
         <div id="frame">
             <c:if test="#{!bcms.client.getFireSessionState() or (bcms.client.getFireSessionState() and !bcms.client.isFireSession())}">
                 <h:form> 
@@ -77,7 +77,10 @@
                 </h:form>
             </c:if>
         </div>
-        <script src="js/myAjax.js"></script>
+        </c:if>
+        <c:if test="#{bcms.isOnFireSession}">
+            <ui:include src="fireSession.xhtml"/>
+        </c:if>
         <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
         <script type="text/javascript">
                                                 $(window).load(function () {
@@ -86,9 +89,6 @@
         </script>
 
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
-        <script src="testLoader/dist/helpers/jquery.easing.1.3.js"></script>
-        <script src="testLoader/dist/helpers/spin.min.js"></script>
-        <script src="testLoader/dist/jquery.introLoader.js"></script>
 
     </h:body>
 </html>

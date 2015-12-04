@@ -38,7 +38,7 @@ public class Event implements Serializable {
     @Id
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 50)
+    @Size(min = 1, max = 250)
     @Column(name = "EVENT_NAME")
     private String eventName;
     @Size(max = 500)
