@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:body>  
+        <h:form id="formulaire" class="form-horizontal">
+            <fieldset>
+
+                <!-- Form Name -->
+                <legend>Crisis session</legend>
+
+                <!-- Select Multiple -->
+                <div class="form-group">
+                    <h:outputLabel for="routesPolice" class="col-md-4 control-label" value="Select road(s) for Police"/>
+                    <div class="col-md-4">
+                        <h:selectOneListbox id="routesPolice"  class="form-control" value="#{bcms.roadForPolice}" onclick="aRoadIsSelect('police')">
+                            <f:selectItems value="#{bcms.dao.getNameRoutes()}"/>
+                        </h:selectOneListbox>
+                        <h:commandButton disabled="#{bcms.CURRENT_STATE_FIRE != 2}" id="boutonRoadsPolice" class="btn btn-default" action="#{bcms.onClickPoliceSendRoads()}" style="margin-right:5px;" value="Send roads for Police"></h:commandButton>
+                        <p:poll update="boutonRoadsPolice" interval="1"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <h:outputLabel for="routesFire" class="col-md-4 control-label" value="Select road(s) for Fire"/>
+                    <div class="col-md-4">
+                        <h:selectOneListbox id="routesFire"  class="form-control"  value="#{bcms.roadForFire }" onclick="aRoadIsSelect('fire')">
+                            <f:selectItems value="#{bcms.dao.getNameRoutes()}"/>
+                        </h:selectOneListbox>
+                        <h:commandButton disabled="#{bcms.CURRENT_STATE_FIRE != 2}" id="boutonRoadsFire" class="btn btn-default" action="#{bcms.onClickFireSendRoads()}" style="margin-right:5px;" value="Send roads for Fire"></h:commandButton>
+                        <p:poll update="boutonRoadsFire" interval="1"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-4">
+                        <div class="pull-right">
+                            <p:poll interval="1" update="checkPoliceRoadAgree">
+                                <h:outputLabel id="checkPoliceRoadAgree" style="#{(bcms.getFireAgreeWithPoliceRoads() and !bcms.fireDisagreeWithPoliceRoads)?'color:green':'color: red'}"  value="#{bcms.stateFireWithPoliceRoads()}"/>
+                            </p:poll>
+                            <br/>
+
+
+                            <p:poll interval="1" update="checkFireRoadAgree">
+                                <h:outputLabel id="checkFireRoadAgree" style="#{(bcms.getFireAgreeWithFireRoads() and !bcms.fireDisagreeWithFireRoads)?'color:green':'color: red'}" value="#{bcms.stateFireWithFireRoads()} "/>
+                            </p:poll>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- Button (Double) -->
+                <div class="form-group">
+                    <div class="col-md-8 pull-right">
+                        <h:form>
+                            <p:poll interval="1" update="runSession"/>
+                            <h:commandButton id="runSession" action="#{bcms.goToState3ByPolice()}" class="btn btn-primary" style="margin-right:5px;" value="Run session" disabled="#{!bcms.isRoadAgree()}"></h:commandButton>
+
+                            <h:commandButton action="#{bcms.deconnectPoliceman()}" class="btn btn-danger" value="Close session"></h:commandButton>
+                        </h:form>
+                    </div>
+                </div>
+
+            </fieldset>
+        </h:form>
+    </h:body>
+</html>

@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:include src="content/header.xhtml"/>
+    <h:body>
+
+        <c:if test="#{!bcms.client.getFireSessionState() or (bcms.client.getFireSessionState() and !bcms.client.isFireSession())}">
+            <div id="frame">
+                <h:form> 
+                    <p:poll id="poll" interval="1" update="btnFire"/>
+                    <c:if test="#{bcms.client.getFireSessionState() and !bcms.client.isFireSession()}">
+                        <p style="font-size: 18px">Fireman are ever connected</p><br/>
+                    </c:if>
+                    <h:commandLink id="btnFire" action="#{bcms.actionFiremanConnect()}" class="btn btn-lg btn-default"> <span class="glyphicon glyphicon-off"></span>  #{bcms.runOrFollowFireSession()}</h:commandLink>
+
+                </h:form>
+            </div>
+        </c:if>
+        <c:if test="#{bcms.client.fireSession}">
+            <div class="container">
+                <c:if test="#{bcms.CURRENT_STATE_FIRE == 1}">
+                    <ui:include src="content/fire/fireTruckNumber.xhtml"/>
+                </c:if>
+                <c:if test="#{bcms.CURRENT_STATE_FIRE == 2}">
+                    <ui:include src="content/fire/fireExchangeRoad.xhtml"/>
+                </c:if>
+                <c:if test="#{bcms.CURRENT_STATE_FIRE == 3}">
+                    <ui:include src="content/fire/fireSession.xhtml"/>
+                </c:if>
+            </div>
+        </c:if>
+    </h:body>
+</html>

@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:body>  
+        <h:form id="formulaire" class="form-horizontal">
+            <fieldset>
+
+                <!-- Form Name -->
+                <legend>Crisis session</legend>
+
+                <h:panelGroup id="Road">
+                    <h:outputText id="roadotp" value="#{!bcms.policeSendRoads?'Waiting for police roads':'Police roads'}"/>
+                    <h:selectOneListbox id="roadp"  class="form-control">
+                        <c:if test="#{!bcms.policeSendRoads}"><f:selectItem itemValue="---"/></c:if>
+                        <c:if test="#{bcms.policeSendRoads}"><f:selectItem itemValue="#{bcms.roadForPolice}"/></c:if>
+                    </h:selectOneListbox>
+                    <h:commandButton id="boutonAgreeWithPoliceRoads" disabled='#{!bcms.policeSendRoads}' action="#{bcms.onClickAgreeWithPoliceRoads()}" class="#{bcms.styleBoutonAgreeWithPoliceRoads()}" style="margin-right:5px;" value="Agree for police roads"></h:commandButton>
+                    <h:commandButton id="boutonDisagreeWithPoliceRoads" disabled='#{!bcms.policeSendRoads or (bcms.styleBoutonAgreeWithPoliceRoads() == "btn btn-success")}' action="#{bcms.onClickDisagreeWithPoliceRoads()}" class="#{bcms.styleBoutonDisagreeWithPoliceRoads()}" style="margin-right:5px;" value="Disagree for police roads"></h:commandButton>
+
+                    <br/>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                    <h:outputText id="roadotf" value="#{!bcms.fireSendRoads?'Waiting for fire roads':'Fire roads'}"/>
+                    <h:selectOneListbox id="roadf"  class="form-control">
+                        <c:if test="#{!bcms.fireSendRoads}"><f:selectItem itemValue="---"/></c:if>
+                        <c:if test="#{bcms.fireSendRoads}"><f:selectItem itemValue="#{bcms.roadForFire}"/></c:if>
+                    </h:selectOneListbox>
+                    <h:commandButton id="boutonAgreeWithFireRoads" disabled='#{!bcms.fireSendRoads}' action="#{bcms.onClickAgreeWithFireRoads()}" onclick="agreeFireRoad()" class="#{bcms.styleBoutonAgreeWithFireRoads()}" style="margin-right:5px;" value="Agree for fire roads"></h:commandButton>
+                    <h:commandButton id="boutonDisagreeWithFireRoads" disabled='#{!bcms.fireSendRoads or (bcms.styleBoutonAgreeWithFireRoads() == "btn btn-success")}' action="#{bcms.onClickDisagreeWithFireRoads()}" class="#{bcms.styleBoutonDisagreeWithFireRoads()}" style="margin-right:5px;" value="Disagree for fire roads"></h:commandButton>
+
+                </h:panelGroup>
+                <p:poll update="Road" interval="1"/>
+                <!-- Button (Double) -->
+                <div class="form-group ">
+                    <div class="col-md-8 pull-right">
+                        <h:commandButton id="boutonRunSessionFire" disabled="#{!bcms.isRoadAgree()}" action="#{bcms.goToState3ByFire()}" class="btn btn-primary" style="margin-right:5px;" value="Run session"></h:commandButton>
+                        <h:commandButton action="#{bcms.deconnectFireman()}" class="btn btn-danger" value="Close session"></h:commandButton>
+                    </div>
+                </div>
+
+            </fieldset>
+        </h:form>
+    </h:body>
+</html>
