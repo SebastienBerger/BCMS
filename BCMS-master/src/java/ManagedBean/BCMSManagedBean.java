@@ -34,8 +34,8 @@ public class BCMSManagedBean {
     @EJB
     private BCMSDaoLocalReader dao;
 
-    private int nbPoliceVehicule;
-    private int nbFireVehicule;
+    private int nbPoliceVehicule = 0;
+    private int nbFireVehicule = 0;
     private String[] fireTruck;
     private String[] policeVehicle;
     private String roadForPolice = "";
@@ -605,5 +605,27 @@ public class BCMSManagedBean {
 
         return result;
     }
+private boolean followRoadFire;
+private boolean followRoadPolice;
+    public boolean isFollowRoadFire() {
+        return followRoadFire;
+    }
 
+    public void setFollowRoadFire(boolean followRoadFire) {
+        this.followRoadFire = followRoadFire;
+    }
+
+    /**
+     * @return the followRoadPolice
+     */
+    public boolean isFollowRoadPolice() {
+        return followRoadPolice;
+    }
+
+    /**
+     * @param followRoadPolice the followRoadPolice to set
+     */
+    public void setFollowRoadPolice(boolean followRoadPolice) {
+        this.followRoadPolice = followRoadPolice;
+    }
 }
