@@ -645,7 +645,7 @@ public class BCMS extends Timer_monitor implements FSC, PSC {
             _bCMS_state_machine.fires(_Police_vehicle_arrived, _Police_vehicles_arriving, _Police_vehicles_arriving, this, "police_vehicle_arrived_less_than_police_vehicle_dispatched", null, this, "enough_police_vehicles_arrived", null, AbstractStatechart.Reentrance);
             _bCMS_state_machine.run_to_completion(_Police_vehicle_arrived);
 
-            service.createEvent(_Police_vehicle_dispatched, _bCMS_state_machine.current_state(), "PSC");
+            service.createEvent(_Police_vehicle_arrived, _bCMS_state_machine.current_state(), "PSC");
 
             BcmsSessionPoliceVehicle bcmspv = new BcmsSessionPoliceVehicle();
             bcmspv = serviceR.getBcmsSessionPoliceVehicleByPoliceVehicleName(pv);

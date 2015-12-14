@@ -19,7 +19,7 @@
                 </div>
             </div>
             <div class="col-md-8 pull-right">
-                <h:commandButton id="runSession" disabled="#{!bcms.client.policeSession}" action="#{bcms.goToState2ByFire()}" class="btn btn-primary" style="margin-right:5px;" value="Set trucks number"></h:commandButton>
+                <h:commandButton id="runSession" disabled="#{bcms.CURRENT_STATE_FIRE != 1}" action="#{bcms.goToState2ByFire()}" class="btn btn-primary" style="margin-right:5px;" value="Set trucks number"></h:commandButton>
             </div>
             <p:poll update="runSession" interval="1"/>
         </h:form>

@@ -500,7 +500,7 @@ public class BCMSManagedBean {
 
     public void closeSessionByPolice() throws Statechart_exception {
         sessionCloseByPolice = true;
-        CURRENT_STATE_POLICE = 0;
+        CURRENT_STATE_POLICE = -1;
         if (sessionCloseByFire && sessionCloseByPolice) {
             police.close();
             police.reset();
@@ -510,7 +510,7 @@ public class BCMSManagedBean {
 
     public void closeSessionByFire() throws Statechart_exception {
         sessionCloseByFire = true;
-        CURRENT_STATE_FIRE = 0;
+        CURRENT_STATE_FIRE = -1;
         if (sessionCloseByFire && sessionCloseByPolice) {
             fire.close();
             fire.reset();

@@ -55,7 +55,6 @@
                             <p:poll interval="1" update="runSession"/>
                             <h:commandButton id="runSession" action="#{bcms.goToState3ByPolice()}" class="btn btn-primary" style="margin-right:5px;" value="Run session" disabled="#{!bcms.isRoadAgree()}"></h:commandButton>
 
-                            <h:commandButton action="#{bcms.deconnectPoliceman()}" class="btn btn-danger" value="Close session"></h:commandButton>
                         </h:form>
                     </div>
                 </div>
